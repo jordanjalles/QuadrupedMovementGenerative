@@ -6512,12 +6512,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 3726642537962429711}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1445653923 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1821537526133869222, guid: 655caaf6380f4fb4b910c4082116e80f,
-    type: 3}
-  m_PrefabInstance: {fileID: 968280267}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1460595480
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7515,7 +7509,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1644474100}
-  m_LocalRotation: {x: 0.08211666, y: 0.38273093, z: -0.03417754, w: 0.91956836}
+  m_LocalRotation: {x: 0.029866349, y: 0.41260585, z: -0.013537042, w: 0.9103193}
   m_LocalPosition: {x: -62.9, y: 7.8, z: -31.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -7570,7 +7564,7 @@ LookAtConstraint:
   m_IsContraintActive: 1
   m_IsLocked: 0
   m_Sources:
-  - sourceTransform: {fileID: 1445653923}
+  - sourceTransform: {fileID: 1731196081}
     weight: 1
 --- !u!1 &1731196080
 GameObject:
@@ -7584,6 +7578,7 @@ GameObject:
   - component: {fileID: 1731196084}
   - component: {fileID: 1731196082}
   - component: {fileID: 1731196083}
+  - component: {fileID: 1731196085}
   m_Layer: 0
   m_Name: GenerativeQuadruped
   m_TagString: Untagged
@@ -7599,7 +7594,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1731196080}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.5000003, y: -0.01999998, z: 0.5}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 9114179963327684516}
@@ -7620,7 +7615,7 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 0
+  MaxStep: 1200
   target: {fileID: 4834058600169995882}
   positionSpringPower: 100
   positionDamperMultiplier: 2
@@ -7650,14 +7645,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 1
+    VectorObservationSize: 197
     NumStackedVectorObservations: 1
-    VectorActionSize: 01000000
+    VectorActionSize: 34000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: d8a6ec6fc84ca404ea4ac60e6fac699c, type: 3}
   m_InferenceDevice: 1
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: QuadrupedMotion
   TeamId: 0
   m_UseChildSensors: 1
@@ -7693,6 +7688,20 @@ MonoBehaviour:
   sensedSegments: []
   frontLimbs: []
   backLimbs: []
+--- !u!114 &1731196085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1731196080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 5
+  TakeActionsBetweenDecisions: 1
 --- !u!1 &1739260653
 GameObject:
   m_ObjectHideFlags: 0
@@ -9687,7 +9696,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1238866859722808816}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.004000008, y: 2.9, z: 31.300003}
+  m_LocalPosition: {x: -29.7, y: 2.9, z: -2.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4834058598912090803}

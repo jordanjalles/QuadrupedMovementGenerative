@@ -11,13 +11,15 @@ public class BodyGenerator : MonoBehaviour
     public float angularYimitDefault = 30f ;
     public float angularZimitDefault = 10f;
 
-    private float spawnTime;
+    private float moveTime;
     private float minJointSettlingTime = 0.5f; //seconds
     private bool jointsSettled = false;
 
     public GameObject limbSegmentPrefab;
     public GameObject jointPrefab;
     public GameObject bodyPrefab;
+    public GameObject headPrefab;
+    public GameObject tailPrefab;
 
     [HideInInspector]
     public Rigidbody chest;
@@ -36,7 +38,7 @@ public class BodyGenerator : MonoBehaviour
 
     public virtual void Awake()
     {
-        spawnTime = Time.time;
+        moveTime = Time.time;
         SetUpBody();
         SetAllMassesByVolume();
         StoreAllMotorJoints();
@@ -49,13 +51,13 @@ public class BodyGenerator : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (Time.time - spawnTime < minJointSettlingTime || !jointsSettled)
+        if (Time.time - moveTime < minJointSettlingTime || !jointsSettled)
         {
             jointsSettled = true;
             foreach (Rigidbody rBody in this.GetComponentsInChildren<Rigidbody>())
             {
                 //if any body parts are still flailing
-                if (rBody.velocity.magnitude > 1)
+                if (rBody.velocity.magnitude > 3)
                 {
                     jointsSettled = false;
                 }
@@ -63,7 +65,10 @@ public class BodyGenerator : MonoBehaviour
                 rBody.velocity = Vector3.zero;
                 rBody.angularVelocity = Vector3.zero;
                 LocalizeRigidbody(rBody, baseScale*5);
+
+                
             }
+            
 
             //Debug.Log(jointsSettled);
             chest.isKinematic = true;
@@ -75,6 +80,14 @@ public class BodyGenerator : MonoBehaviour
             chest.isKinematic = false;
         }
     }
+
+    public void MoveChest(Vector3 position)
+    {
+        chest.MovePosition(position);
+        moveTime = Time.time;
+        jointsSettled = false;
+    }
+    
 
     private void LocalizeRigidbody(Rigidbody r, float limit)
     {
@@ -119,11 +132,11 @@ public class BodyGenerator : MonoBehaviour
     {
         chest = PrefabBodySegment(bodyPrefab);
         chest.name = "chest";
-        chest.transform.localScale = new Vector3(baseScale * 2f, baseScale * 1f, baseScale * 1.5f);
+        chest.transform.localScale = new Vector3(baseScale * 1.5f, baseScale * 1f, baseScale * 1.5f);
 
         hips = PrefabBodySegment(bodyPrefab);
         hips.name = "hips";
-        hips.transform.localScale = new Vector3(baseScale * 2f, baseScale * 1f, baseScale * 1.5f);
+        hips.transform.localScale = new Vector3(baseScale * 1.5f, baseScale * 1f, baseScale * 1.5f);
 
         ConfigurableJoint chestXhips = ConnectWithJoint(chest, hips, "hinge");
         SetJointXLimits(chestXhips, -30, 10);
@@ -132,7 +145,6 @@ public class BodyGenerator : MonoBehaviour
 
         torso.Add(chest);
         torso.Add(hips);
-
 
         this.torso.Add(chest);
         this.torso.Add(hips);

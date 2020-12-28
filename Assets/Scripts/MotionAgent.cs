@@ -124,6 +124,7 @@ public class MotionAgent : Agent
 
             if (FallenDownConditions())
             {
+                
                 ResetLocation();
                 //face random direction
                 this.core.MoveRotation(Quaternion.Euler(new Vector3(0, Random.value * 360, 0)));
@@ -139,8 +140,9 @@ public class MotionAgent : Agent
 
     private void ResetLocation()
     {
-        core.transform.localPosition = new Vector3(0, 2f, 0);
-        core.transform.rotation = Quaternion.identity;
+        
+        body.MoveChest( (new Vector3(0, 1f, 0)));
+        core.MoveRotation(Quaternion.identity);
         core.velocity = Vector3.zero;
         core.angularVelocity = Vector3.zero;
     }
@@ -155,14 +157,14 @@ public class MotionAgent : Agent
         return (touchingGroundOtherThanFeet || Vector3.Dot(core.transform.up, Vector3.up) < minUpVectorDot);
     }
 
-    //total observation size 32
+    
     public override void CollectObservations(VectorSensor sensor)
     {
-        Debug.Log(body.sensedSegments.Count + " SensedSegments");
+        int totalObservations = 0;
         
         //target position vec3
         sensor.AddObservation(core.transform.InverseTransformPoint(target.position).normalized);
-
+        totalObservations += 3;
         //limb positions vec3 * 12
         //limb rotation vec3 * 12
         //limb touchign ground bool * 12
@@ -170,18 +172,27 @@ public class MotionAgent : Agent
         {
             //segment attributes relative to core
             sensor.AddObservation(core.transform.InverseTransformPoint(seg.position));
+            totalObservations += 3;
+
             sensor.AddObservation(seg.transform.localRotation);
+            totalObservations += 3;
+
             sensor.AddObservation(core.transform.InverseTransformDirection(seg.velocity));
+            totalObservations += 3;
+
             sensor.AddObservation(core.transform.InverseTransformDirection(seg.angularVelocity));
+            totalObservations += 3;
+
             sensor.AddObservation(seg.GetComponent<TouchingGround>().touching);
+            totalObservations += 1;
         }
         
         sensor.AddObservation(this.maxSpringForce);
-        /*
-        sensor.AddObservation(frontScale);
-        sensor.AddObservation(backScale);
-        */
-        sensor.
+        totalObservations += 1;
+
+        //Debug.Log(totalObservations + " total observations");
+
+
     }
 
     //execute the actions given from the brain
@@ -193,7 +204,7 @@ public class MotionAgent : Agent
         float maxRotation;
 
         this.forceUsedPercent = 0f;
-
+        //Debug.Log(vectorAction[0] + "vectorAction[0]");
         for (int i = 0; i < body.motorJoints.Count; i++) {
             ConfigurableJoint cJoint = body.motorJoints[i];
 
@@ -275,8 +286,8 @@ public class MotionAgent : Agent
         float velocityTowardsTarget = core.velocity.magnitude * Vector3.Dot(core.velocity.normalized, (target.position - core.transform.position).normalized);
         //velocity towards target limit 1
         float vttl1 = Mathf.Max((float)System.Math.Tanh(velocityTowardsTarget * 0.25f), 0);
-        Debug.Log(Mathf.Pow(vttl1, 2));
-        DrawRedGreen(Mathf.Pow(vttl1, 2));
+        
+        //DrawRedGreen(Mathf.Pow(vttl1, 2));
 
         float levelHorizon = Mathf.InverseLerp(minUpVectorDot, 1f, Vector3.Dot(core.transform.up, Vector3.up));
 
@@ -368,7 +379,10 @@ public class MotionAgent : Agent
         {
             if (seg.name != "lower")
             {
-                touchingGroundOtherThanFeet = true;
+                if (seg.GetComponent<TouchingGround>().touching == true)
+                {
+                    touchingGroundOtherThanFeet = true;
+                }
             }
         }
         return touchingGroundOtherThanFeet;

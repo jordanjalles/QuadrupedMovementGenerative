@@ -10,6 +10,8 @@ public class QuadBody : BodyGenerator
     public List<Rigidbody> backLimbs;
     [HideInInspector]
 
+    
+
     /*
     [Range(0.5f, 1f)]
     public float backLegsSizeMin;
