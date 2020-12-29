@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 public class BodyGenerator : MonoBehaviour
 {
-    
+
     public float baseScale = 1f;
     public float density = 1f;
-    public float highAngularXLimitDefault = 60f;
-    public float lowAngularXLimitDefault = 60f;
-    public float angularYimitDefault = 30f ;
-    public float angularZimitDefault = 10f;
+    public float ballHighAngularXLimitDefault = 60f;
+    public float ballLowAngularXLimitDefault = 60f;
+    public float ballAngularYimitDefault = 30f;
+    public float ballAngularZimitDefault = 10f;
+
+    public float kneeAngularXLimitDefault = 30f;
+    public float ankleAngularXLimitDefault = 20f;
+    public float torsoAngularXLimitDefault = 10f;
+
+
+
 
     private float moveTime;
     private float minJointSettlingTime = 0.5f; //seconds
@@ -36,6 +43,15 @@ public class BodyGenerator : MonoBehaviour
     public List<Rigidbody> sensedSegments = new List<Rigidbody>();
 
 
+    protected Dictionary<string, Vector3> defaultScales = new Dictionary<string, Vector3>()
+    {
+        { "upper" ,  new Vector3(0.5f, 0.5f, 1f) },
+        { "middle" , new Vector3(0.3f, 0.3f, 1f) },
+        { "lower" , new Vector3(0.2f, 0.2f, 1f) },
+        { "chest" , new Vector3(1.5f, 1f, 1.5f) },
+        { "hips" , new Vector3(1.5f, 1f, 1.5f) }
+    };
+
     public virtual void Awake()
     {
         moveTime = Time.time;
@@ -61,14 +77,14 @@ public class BodyGenerator : MonoBehaviour
                 {
                     jointsSettled = false;
                 }
-                
+
                 rBody.velocity = Vector3.zero;
                 rBody.angularVelocity = Vector3.zero;
-                LocalizeRigidbody(rBody, baseScale*5);
+                LocalizeRigidbody(rBody, baseScale * 5);
 
-                
+
             }
-            
+
 
             //Debug.Log(jointsSettled);
             chest.isKinematic = true;
@@ -87,7 +103,7 @@ public class BodyGenerator : MonoBehaviour
         moveTime = Time.time;
         jointsSettled = false;
     }
-    
+
 
     private void LocalizeRigidbody(Rigidbody r, float limit)
     {
@@ -132,14 +148,14 @@ public class BodyGenerator : MonoBehaviour
     {
         chest = PrefabBodySegment(bodyPrefab);
         chest.name = "chest";
-        chest.transform.localScale = new Vector3(baseScale * 1.5f, baseScale * 1f, baseScale * 1.5f);
+        ScaleSegment(chest, 1.0f);
 
         hips = PrefabBodySegment(bodyPrefab);
         hips.name = "hips";
-        hips.transform.localScale = new Vector3(baseScale * 1.5f, baseScale * 1f, baseScale * 1.5f);
+        ScaleSegment(hips, 1.0f);
 
         ConfigurableJoint chestXhips = ConnectWithJoint(chest, hips, "hinge");
-        SetJointXLimits(chestXhips, -30, 10);
+        SetJointXLimits(chestXhips, -torsoAngularXLimitDefault, torsoAngularXLimitDefault);
 
         List<Rigidbody> torso = new List<Rigidbody>();
 
@@ -153,12 +169,48 @@ public class BodyGenerator : MonoBehaviour
         sensedSegments.Add(hips);
 
         return torso;
+    }
 
+    public void ScaleSegment(Rigidbody segment, float relativeScale)
+    {
+        ConfigurableJoint cJoint = segment.GetComponent<ConfigurableJoint>();
+        Vector3 originalAnchor = Vector3.zero;
+        Vector3 originalConnectedBodyAnchor = Vector3.zero;
 
+        //store joint anchors
+        if (cJoint != null)
+        {
+            originalAnchor = cJoint.anchor;
+            originalConnectedBodyAnchor = cJoint.connectedAnchor;
+        }
+        if (defaultScales.ContainsKey(segment.name))
+        {
+            segment.transform.localScale = defaultScales[segment.name] * baseScale * relativeScale;
+            SetMassByVolume(segment);
+        }
+        else
+        {
+            Debug.LogWarning("Atttempting to scale segment type without default scale: " +segment.name );
+        }
+
+        //reset joint anchors after scaling
+        if (cJoint != null)
+        {
+            cJoint.anchor = originalAnchor;
+            cJoint.connectedAnchor = originalConnectedBodyAnchor;
+        }
+    }
+
+    public void ApplyDefaultScales()
+    {
+        foreach (Rigidbody r in GetComponentsInChildren<Rigidbody>())
+        {
+            ScaleSegment(r, 1.0f);
+        }
     }
 
 
-    protected List<Rigidbody>CreateTwoJointLimb()
+    protected List<Rigidbody> CreateTwoJointLimb()
     {
         Rigidbody upperRbody = PrefabBodySegment(limbSegmentPrefab);
         Rigidbody middleRbody = PrefabBodySegment(limbSegmentPrefab);
@@ -168,15 +220,18 @@ public class BodyGenerator : MonoBehaviour
         middleRbody.name = "middle";
         lowerRbody.name = "lower";
 
-        upperRbody.transform.localScale = new Vector3(baseScale * 0.5f, baseScale * 0.5f, baseScale);
-        middleRbody.transform.localScale = new Vector3(baseScale * 0.3f, baseScale * 0.3f, baseScale);
-        lowerRbody.transform.localScale = new Vector3(baseScale * 0.25f, baseScale * 0.25f, baseScale);
+        ScaleSegment(upperRbody, 1.0f);
+        ScaleSegment(middleRbody, 1.0f);
+        ScaleSegment(lowerRbody, 1.0f);
 
-        middleRbody.transform.rotation = Quaternion.Euler(new Vector3(-60f, 0f, 0f));
-        lowerRbody.transform.rotation = Quaternion.Euler(new Vector3(60f, 0f, 0f));
+        middleRbody.transform.rotation = Quaternion.Euler(new Vector3(-45f, 0f, 0f));
+        lowerRbody.transform.rotation = Quaternion.Euler(new Vector3(45f, 0f, 0f));
 
-        ConnectWithJoint(middleRbody, upperRbody, "hinge");
-        ConnectWithJoint(lowerRbody, middleRbody, "hinge");
+        ConfigurableJoint knee = ConnectWithJoint(middleRbody, upperRbody, "hinge");
+        ConfigurableJoint ankle = ConnectWithJoint(lowerRbody, middleRbody, "hinge");
+
+        SetJointXLimits(knee, -kneeAngularXLimitDefault, kneeAngularXLimitDefault);
+        SetJointXLimits(ankle, -ankleAngularXLimitDefault, ankleAngularXLimitDefault);
 
         List<Rigidbody> limb = new List<Rigidbody>();
 
@@ -258,7 +313,7 @@ public class BodyGenerator : MonoBehaviour
         j.angularYMotion = ConfigurableJointMotion.Limited;
         j.angularZMotion = ConfigurableJointMotion.Limited;
 
-        SetJointAllLimits(j, lowAngularXLimitDefault, highAngularXLimitDefault, angularYimitDefault, angularZimitDefault);
+        SetJointAllLimits(j, ballLowAngularXLimitDefault, ballHighAngularXLimitDefault, ballAngularYimitDefault, ballAngularZimitDefault);
     }
 
 
@@ -272,7 +327,7 @@ public class BodyGenerator : MonoBehaviour
         j.angularYMotion = ConfigurableJointMotion.Locked;
         j.angularZMotion = ConfigurableJointMotion.Locked;
 
-        SetJointXLimits(j, lowAngularXLimitDefault, highAngularXLimitDefault);
+        SetJointXLimits(j, ballLowAngularXLimitDefault, ballHighAngularXLimitDefault);
     }
 
     protected void SetJointXLimits(ConfigurableJoint j, float lowXlimit, float highXlimit)
@@ -305,12 +360,17 @@ public class BodyGenerator : MonoBehaviour
         
     }
 
+    protected void SetMassByVolume(Rigidbody rb)
+    {
+        rb.mass = rb.transform.localScale.x * rb.transform.localScale.y * rb.transform.localScale.z * density;
+    }
+
 
     protected void SetAllMassesByVolume()
     {
         foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
         {
-            rb.mass = rb.transform.localScale.x* rb.transform.localScale.y * rb.transform.localScale.z * density;
+            SetMassByVolume(rb);
         }
     }
 

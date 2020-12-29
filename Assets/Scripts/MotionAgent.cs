@@ -16,7 +16,7 @@ public class MotionAgent : Agent
     public BodyGenerator body;
 
     public float minUpVectorDot = 0.9f;
-    public float distanceToTouchTarget = 1f;
+    public float distanceToTouchTarget = 3f;
     public float targetDistanceRange = 18f;
 
     public enum RewardMode {SeekTarget, StandUp};
@@ -25,7 +25,8 @@ public class MotionAgent : Agent
     public bool immortal = false;
     
     public bool randomizeMaxSpringForce = false;
-    //public bool randomizeLegScales = false;
+    public bool randomizeLegScales = false;
+    private bool successfullEpisode = true;
     
     public float frontScale = 0.75f;
     public float backScale = 0.75f;
@@ -99,6 +100,30 @@ public class MotionAgent : Agent
             this.maxSpringForce = this.initialMaxSpringForce * RandomGaussian();
             //Debug.Log(this.maxSpringForce / this.initialMaxSpringForce);
         }
+        //only change leg sizes if the episode was successful - counteracts the law of the jungle problem
+        Debug.Log(successfullEpisode + " successfullEpisode");
+        if (randomizeLegScales && successfullEpisode)
+        {
+            RandomizeLegScales();
+        }
+        successfullEpisode = false;
+    }
+
+    private void RandomizeLegScales()
+    {
+        float frontScale = Random.value + 0.5f;
+        float backScale = Random.value + 0.5f;
+        for (int i = 0; i < body.limbs.Count; i++)
+        {
+            if (i < body.limbs.Count / 2)
+            {
+                body.ScaleSegment(body.limbs[i], frontScale);
+            }
+            else
+            {
+                body.ScaleSegment(body.limbs[i], backScale);
+            }
+        }
     }
 
 
@@ -112,7 +137,7 @@ public class MotionAgent : Agent
             }
             ResetLocation();
             //flip around to random rotation
-            this.core.MoveRotation(Quaternion.Euler(new Vector3(0f, Random.value * 360, 90 + Random.value * 180)));
+            this.transform.rotation = (Quaternion.Euler(new Vector3(0f, Random.value * 360, 90 + Random.value * 180)));
         }
 
         if (rewardMode == RewardMode.SeekTarget)
@@ -127,10 +152,10 @@ public class MotionAgent : Agent
                 
                 ResetLocation();
                 //face random direction
-                this.core.MoveRotation(Quaternion.Euler(new Vector3(0, Random.value * 360, 0)));
+                this.transform.rotation = (Quaternion.Euler(new Vector3(0, Random.value * 360, 0)));
             }
 
-            while (DistanceToTarget() < distanceToTouchTarget * 3)
+            while (DistanceToTarget() < distanceToTouchTarget * 2)
             {
                 RandomizeTargetLocation();
             }
@@ -141,8 +166,8 @@ public class MotionAgent : Agent
     private void ResetLocation()
     {
         
-        body.MoveChest( (new Vector3(0, 1f, 0)));
-        core.MoveRotation(Quaternion.identity);
+        body.MoveChest(Vector3.zero);
+        core.transform.rotation = (Quaternion.identity);
         core.velocity = Vector3.zero;
         core.angularVelocity = Vector3.zero;
     }
@@ -165,13 +190,15 @@ public class MotionAgent : Agent
         //target position vec3
         sensor.AddObservation(core.transform.InverseTransformPoint(target.position).normalized);
         totalObservations += 3;
+
+        
         //limb positions vec3 * 12
         //limb rotation vec3 * 12
         //limb touchign ground bool * 12
         foreach (Rigidbody seg in body.sensedSegments)
         {
             //segment attributes relative to core
-            sensor.AddObservation(core.transform.InverseTransformPoint(seg.position));
+            sensor.AddObservation(core.transform.InverseTransformPoint(seg.transform.position));
             totalObservations += 3;
 
             sensor.AddObservation(seg.transform.localRotation);
@@ -248,6 +275,7 @@ public class MotionAgent : Agent
             AddReward(10f);
             if (!immortal)
             {
+                successfullEpisode = true;
                 EndEpisode();
             }
         }
@@ -266,6 +294,7 @@ public class MotionAgent : Agent
             SetReward(-1.0f);
             if (!immortal)
             {
+                successfullEpisode = false;
                 EndEpisode();
             }
         }
@@ -295,9 +324,11 @@ public class MotionAgent : Agent
 
         reward *= facingTarget;
         reward *= Mathf.Pow(vttl1, 2);
-        reward *= efficiencyRollingAverage;
+        //reward *= efficiencyRollingAverage;
         reward *= movementSmoothness;
         //reward *= levelHorizon;
+
+        reward *= 4; //multiply the reward by # of limiting factors to increase signal
 
         //DrawRedGreen(vttl1);
         //Debug.Log("vttl1: " + vttl1);
@@ -310,12 +341,13 @@ public class MotionAgent : Agent
         if (DistanceToTarget() < distanceToTouchTarget)
         {
             SetReward(1.0f);
+            successfullEpisode = true;
             EndEpisode();
         }
     }
     private float DistanceToTarget()
     {
-        return Vector3.Distance(core.transform.localPosition, target.localPosition);
+        return Vector3.Distance(core.transform.position, target.position);
     }
     private void DrawRedGreen(float reward)
     {
@@ -377,9 +409,9 @@ public class MotionAgent : Agent
         touchingGroundOtherThanFeet = false;
         foreach (Rigidbody seg in body.sensedSegments)
         {
-            if (seg.name != "lower")
-            {
-                if (seg.GetComponent<TouchingGround>().touching == true)
+            if (seg.GetComponent<TouchingGround>().touching == true)
+                {
+                if (seg.name != "lower")
                 {
                     touchingGroundOtherThanFeet = true;
                 }

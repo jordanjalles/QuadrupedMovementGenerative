@@ -276,7 +276,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2573156585093789087}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6758110994435022475}
@@ -296,10 +296,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseScale: 0.5
   density: 4
-  highAngularXLimitDefault: 60
-  lowAngularXLimitDefault: -60
-  angularYimitDefault: 30
-  angularZimitDefault: 10
+  ballHighAngularXLimitDefault: 60
+  ballLowAngularXLimitDefault: -60
+  ballAngularYimitDefault: 30
+  ballAngularZimitDefault: 10
+  kneeAngularXLimitDefault: 30
+  ankleAngularXLimitDefault: 20
+  torsoAngularXLimitDefault: 10
   limbSegmentPrefab: {fileID: 2035216561820468858, guid: b6f5464f363383d47972f00b6e134ee9,
     type: 3}
   jointPrefab: {fileID: 1239690454118264645, guid: 244545e94479ce34995f251954036cb2,
@@ -340,15 +343,16 @@ MonoBehaviour:
   maxSpringForce: 30
   body: {fileID: 2573156585093789083}
   minUpVectorDot: 0.9
-  distanceToTouchTarget: 1
+  distanceToTouchTarget: 2
   targetDistanceRange: 18
   rewardMode: 0
   immortal: 0
   randomizeMaxSpringForce: 0
+  randomizeLegScales: 1
   frontScale: 0.75
   backScale: 0.75
   stateBasedModelSwitching: 0
-  seekTargetModel: {fileID: 5022602860645237092, guid: 44f537ab391d3c5479ecf55be2ee57d6,
+  seekTargetModel: {fileID: 5022602860645237092, guid: 9ea8b6ed77a1f3f41a65fd16bcb5c1ad,
     type: 3}
   standUpModel: {fileID: 5022602860645237092, guid: 44f537ab391d3c5479ecf55be2ee57d6,
     type: 3}
@@ -370,7 +374,7 @@ MonoBehaviour:
     VectorActionSize: 34000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
-  m_Model: {fileID: 5022602860645237092, guid: 44f537ab391d3c5479ecf55be2ee57d6, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 9ea8b6ed77a1f3f41a65fd16bcb5c1ad, type: 3}
   m_InferenceDevice: 1
   m_BehaviorType: 0
   m_BehaviorName: QuadrupedMotionBehaviour
