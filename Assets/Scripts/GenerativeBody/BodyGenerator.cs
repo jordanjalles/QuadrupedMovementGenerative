@@ -3,9 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 public class BodyGenerator : MonoBehaviour
 {
-
+    [Header("Physical attributes")]
     public float baseScale = 1f;
     public float density = 1f;
+
+    [Header("Joint drive settigs")]
+    public float positionSpringPower = 3000;
+    public float positionDamperMultiplier = 2; //how much stronger should the position damper be than max spring force
+    public float maxSpringForce = 30;
+    public bool scaleForceByCrossSection = false;
+
+    [Header("Joint limit defaults")]
     public float ballHighAngularXLimitDefault = 60f;
     public float ballLowAngularXLimitDefault = 60f;
     public float ballAngularYimitDefault = 30f;
@@ -22,6 +30,7 @@ public class BodyGenerator : MonoBehaviour
     private float minJointSettlingTime = 0.5f; //seconds
     private bool jointsSettled = false;
 
+    [Header("Limb prefabs")]
     public GameObject limbSegmentPrefab;
     public GameObject jointPrefab;
     public GameObject bodyPrefab;
@@ -42,7 +51,8 @@ public class BodyGenerator : MonoBehaviour
     [HideInInspector]
     public List<Rigidbody> sensedSegments = new List<Rigidbody>();
 
-
+    [Header("Default body part scales")]
+    [SerializeField]
     protected Dictionary<string, Vector3> defaultScales = new Dictionary<string, Vector3>()
     {
         { "upper" ,  new Vector3(0.5f, 0.5f, 1f) },
@@ -190,7 +200,7 @@ public class BodyGenerator : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Atttempting to scale segment type without default scale: " +segment.name );
+            Debug.LogWarning("Attempting to scale segment type without default scale: " +segment.name );
         }
 
         //reset joint anchors after scaling
@@ -239,6 +249,7 @@ public class BodyGenerator : MonoBehaviour
         limb.Add(middleRbody);
         limb.Add(lowerRbody);
         
+
         limbs.Add(upperRbody);
         limbs.Add(middleRbody);
         limbs.Add(lowerRbody);
@@ -356,8 +367,38 @@ public class BodyGenerator : MonoBehaviour
         //replace limits
         j.angularYLimit = angularYLimit;
         j.angularZLimit = angularZLimit;
+    }
+    public void DriveJoint(ConfigurableJoint cJoint, Vector3 direction, float effort)
+    {
+        Vector3 constrainedDirection = Vector3.zero;
+        constrainedDirection.x = Mathf.Lerp(cJoint.lowAngularXLimit.limit, cJoint.highAngularXLimit.limit, direction.x);
+        constrainedDirection.y = Mathf.Lerp(-cJoint.angularYLimit.limit, cJoint.angularYLimit.limit, direction.y);
+        constrainedDirection.z = Mathf.Lerp(-cJoint.angularZLimit.limit, cJoint.angularZLimit.limit, direction.z);
 
+        cJoint.targetRotation = Quaternion.Euler(constrainedDirection);
         
+        float newForce = effort * maxSpringForce;
+
+        if (scaleForceByCrossSection)
+        {
+            newForce *= baseScale * baseScale;
+        }
+
+        SetJointDriveMaximumForce(cJoint, newForce);
+    }
+
+
+    public void SetJointDriveMaximumForce(ConfigurableJoint cJoint, float newMaximumForce)
+    {
+        JointDrive jDrive = new JointDrive();
+        jDrive.maximumForce = newMaximumForce;
+        jDrive.positionSpring = this.positionSpringPower;
+        jDrive.positionDamper = this.maxSpringForce * positionDamperMultiplier;
+        if (scaleForceByCrossSection)
+        {
+            jDrive.positionDamper *= baseScale * baseScale;
+        }
+        cJoint.slerpDrive = jDrive;
     }
 
     protected void SetMassByVolume(Rigidbody rb)

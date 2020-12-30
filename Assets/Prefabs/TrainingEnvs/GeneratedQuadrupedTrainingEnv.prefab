@@ -29,7 +29,7 @@ Transform:
   m_Children:
   - {fileID: 7086524553371226090}
   m_Father: {fileID: 6758110994435022475}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &677616433378894516
 GameObject:
@@ -246,7 +246,7 @@ Transform:
   m_Children:
   - {fileID: 8757523640734108249}
   m_Father: {fileID: 6758110994435022475}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &2573156585093789087
 GameObject:
@@ -280,7 +280,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6758110994435022475}
-  m_RootOrder: 6
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2573156585093789083
 MonoBehaviour:
@@ -296,6 +296,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseScale: 0.5
   density: 4
+  positionSpringPower: 3000
+  positionDamperMultiplier: 5
+  maxSpringForce: 30
+  scaleForceByCrossSection: 0
   ballHighAngularXLimitDefault: 60
   ballLowAngularXLimitDefault: -60
   ballAngularYimitDefault: 30
@@ -337,22 +341,24 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 1200
-  target: {fileID: 6963610560090537797}
   positionSpringPower: 3000
   positionDamperMultiplier: 2
   maxSpringForce: 30
   body: {fileID: 2573156585093789083}
-  minUpVectorDot: 0.9
+  target: {fileID: 6963610560090537797}
+  minUpVectorDot: 0.5
   distanceToTouchTarget: 2
   targetDistanceRange: 18
   rewardMode: 0
-  immortal: 0
-  randomizeMaxSpringForce: 0
   randomizeLegScales: 1
-  frontScale: 0.75
-  backScale: 0.75
+  minLegScale: 0.75
+  maxLegScale: 1.25
+  randomizeGrossScale: 0
+  minGrossScale: 0.5
+  maxGrossScale: 2
+  immortalMode: 0
   stateBasedModelSwitching: 0
-  seekTargetModel: {fileID: 5022602860645237092, guid: 9ea8b6ed77a1f3f41a65fd16bcb5c1ad,
+  seekTargetModel: {fileID: 5022602860645237092, guid: b7d937ffff3d8974fbcca00ffdb3f78c,
     type: 3}
   standUpModel: {fileID: 5022602860645237092, guid: 44f537ab391d3c5479ecf55be2ee57d6,
     type: 3}
@@ -374,7 +380,7 @@ MonoBehaviour:
     VectorActionSize: 34000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
-  m_Model: {fileID: 5022602860645237092, guid: 9ea8b6ed77a1f3f41a65fd16bcb5c1ad, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: b7d937ffff3d8974fbcca00ffdb3f78c, type: 3}
   m_InferenceDevice: 1
   m_BehaviorType: 0
   m_BehaviorName: QuadrupedMotionBehaviour
@@ -516,7 +522,7 @@ Transform:
   m_Children:
   - {fileID: 5723801649992366049}
   m_Father: {fileID: 6758110994435022475}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &3640287972938423519
 GameObject:
@@ -545,13 +551,13 @@ Transform:
   m_LocalPosition: {x: -29.7, y: 2.9, z: -2.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 2573156585093789086}
   - {fileID: 6963610558562362268}
   - {fileID: 6963610560090537797}
   - {fileID: 4855238819511823142}
   - {fileID: 1539782085150482602}
   - {fileID: 2574257685062720786}
   - {fileID: 1049051151848957209}
-  - {fileID: 2573156585093789086}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -677,7 +683,7 @@ Transform:
   m_Children:
   - {fileID: 3438457653403910613}
   m_Father: {fileID: 6758110994435022475}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6963610558562362264
 GameObject:
@@ -710,7 +716,7 @@ Transform:
   m_LocalScale: {x: 4, y: 1, z: 4}
   m_Children: []
   m_Father: {fileID: 6758110994435022475}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6963610558562362269
 MeshFilter:
@@ -805,7 +811,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 6758110994435022475}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6963610560090537794
 MeshFilter:

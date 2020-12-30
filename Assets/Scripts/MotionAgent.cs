@@ -5,50 +5,68 @@ using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 public class MotionAgent : Agent
 { 
-    public Transform target;
+    
+
+    //remove once replaced with body methods
     public float positionSpringPower = 100;
     public float positionDamperMultiplier = 2; //how much stronger should the position damper be than max spring force
     public float maxSpringForce = 200;
     
-    private float initialMaxSpringForce;
     private Rigidbody core;
 
     public BodyGenerator body;
 
-    public float minUpVectorDot = 0.9f;
-    public float distanceToTouchTarget = 3f;
-    public float targetDistanceRange = 18f;
+    [Header("Environment settings")]
+    [SerializeField]
+    private Transform target;
+    [SerializeField]
+    private float minUpVectorDot = 0.9f;
+    [SerializeField]
+    private float distanceToTouchTarget = 3f;
+    [SerializeField]
+    private float targetDistanceRange = 18f;
 
+    
     public enum RewardMode {SeekTarget, StandUp};
-    public RewardMode rewardMode;
-    
-    public bool immortal = false;
-    
-    public bool randomizeMaxSpringForce = false;
-    public bool randomizeLegScales = false;
+    [Header("Training settings")]
+    [SerializeField]
+    private RewardMode rewardMode;
+    [SerializeField]
+    private bool randomizeLegScales = false;
+    [SerializeField]
+    private float minLegScale;
+    [SerializeField]
+    private float maxLegScale;
+    [SerializeField]
+    private bool randomizeGrossScale = false;
+    [SerializeField]
+    private float minGrossScale;
+    [SerializeField]
+    private float maxGrossScale;
+
+    [Header("Demonstration settings")]
+    [SerializeField]
+    private bool immortalMode = false;
+    [SerializeField]
+    private bool stateBasedModelSwitching = false;
+    public Unity.Barracuda.NNModel seekTargetModel;
+    public Unity.Barracuda.NNModel standUpModel;
+
+    //Used for reward calculations
     private bool successfullEpisode = true;
-    
-    public float frontScale = 0.75f;
-    public float backScale = 0.75f;
-    
     private float efficiencyRollingAverage = 0;
     private float efficiencyRollingAverageDepth = 10; 
-    
     private Vector3 velocityRollingAverage = Vector3.zero;
     private float velocityRollingAverageDepth = 20;
-    
     private bool touchingGroundOtherThanFeet = false;
-    
     private float forceUsedPercent = 0;
 
-    public bool stateBasedModelSwitching = false;
+   
 
-    public Unity.Barracuda.NNModel seekTargetModel; 
-    public Unity.Barracuda.NNModel standUpModel;
+    
     void Start()
     {
         core = body.chest;
-        this.initialMaxSpringForce = maxSpringForce;
 
         foreach (ConfigurableJoint cj in body.motorJoints)
         {
@@ -95,24 +113,25 @@ public class MotionAgent : Agent
     {
         SetUpTrainingMode();
 
-        if (randomizeMaxSpringForce)
-        {
-            this.maxSpringForce = this.initialMaxSpringForce * RandomGaussian();
-            //Debug.Log(this.maxSpringForce / this.initialMaxSpringForce);
-        }
         //only change leg sizes if the episode was successful - counteracts the law of the jungle problem
-        Debug.Log(successfullEpisode + " successfullEpisode");
+        //Debug.Log(successfullEpisode + " successfullEpisode");
         if (randomizeLegScales && successfullEpisode)
         {
             RandomizeLegScales();
+        }
+        if (randomizeGrossScale && successfullEpisode)
+        {
+            RandomizeGrossScale();
         }
         successfullEpisode = false;
     }
 
     private void RandomizeLegScales()
     {
-        float frontScale = Random.value + 0.5f;
-        float backScale = Random.value + 0.5f;
+        
+        float frontScale = Mathf.Lerp(minLegScale, maxLegScale, Random.value);
+        float backScale = Mathf.Lerp(minLegScale, maxLegScale, Random.value);
+        
         for (int i = 0; i < body.limbs.Count; i++)
         {
             if (i < body.limbs.Count / 2)
@@ -125,9 +144,15 @@ public class MotionAgent : Agent
             }
         }
     }
+    private void RandomizeGrossScale()
+    {
+        float newScale = Mathf.Lerp(minGrossScale, maxGrossScale, Random.value);
+        //scale the body...
+    }
 
 
-    private void SetUpTrainingMode()
+
+        private void SetUpTrainingMode()
     {
         if (rewardMode == RewardMode.StandUp)
         {
@@ -227,10 +252,13 @@ public class MotionAgent : Agent
     public override void OnActionReceived(float[] vectorAction)
     {
         Vector3 controlSignal = Vector3.zero;
+        float forceSignal;
         float minRotation;
         float maxRotation;
 
         this.forceUsedPercent = 0f;
+
+        /*
         //Debug.Log(vectorAction[0] + "vectorAction[0]");
         for (int i = 0; i < body.motorJoints.Count; i++) {
             ConfigurableJoint cJoint = body.motorJoints[i];
@@ -247,15 +275,27 @@ public class MotionAgent : Agent
             maxRotation = cJoint.angularZLimit.limit;
             controlSignal.z = Mathf.Lerp(minRotation, maxRotation, Mathf.InverseLerp(-1, 1, vectorAction[(i * 4) + 2]));
 
-            float forceSignal = Mathf.InverseLerp(-1, 1, vectorAction[i * 4 + 3]);
+            forceSignal = Mathf.InverseLerp(-1, 1, vectorAction[i * 4 + 3]);
             forceUsedPercent += forceSignal / body.motorJoints.Count;
 
             float maximumForce = maxSpringForce * forceSignal;
             SetJointDriveMaximumForce(cJoint, maximumForce);
 
             cJoint.targetRotation = Quaternion.Euler(controlSignal);
-        }
+        }*/
+        
+        //replacement drive loop with body native functions
+        for (int i = 0; i < body.motorJoints.Count; i++)
+        {
+            controlSignal.x = Mathf.InverseLerp(-1, 1, vectorAction[(i * 4)]);
+            controlSignal.y = Mathf.InverseLerp(-1, 1, vectorAction[(i * 4) + 1]);
+            controlSignal.z = Mathf.InverseLerp(-1, 1, vectorAction[(i * 4) + 2]);
+            forceSignal = Mathf.InverseLerp(-1, 1, vectorAction[i * 4 + 3]);
 
+            forceUsedPercent += forceSignal / body.motorJoints.Count;
+            body.DriveJoint(body.motorJoints[i], controlSignal, forceSignal);
+        }
+        
         if (rewardMode == RewardMode.SeekTarget)
         {
             SeekTargetReward();
@@ -273,7 +313,7 @@ public class MotionAgent : Agent
         if (FallenDownConditions() == false)
         {
             AddReward(10f);
-            if (!immortal)
+            if (!immortalMode)
             {
                 successfullEpisode = true;
                 EndEpisode();
@@ -292,7 +332,7 @@ public class MotionAgent : Agent
         if (FallenDownConditions())
         {
             SetReward(-1.0f);
-            if (!immortal)
+            if (!immortalMode)
             {
                 successfullEpisode = false;
                 EndEpisode();
