@@ -28,7 +28,7 @@ public class BodyGenerator : MonoBehaviour
 
     private float moveTime;
     private float minJointSettlingTime = 0.5f; //seconds
-    private bool jointsSettled = false;
+    public bool jointsSettled = false;
 
     [Header("Limb prefabs")]
     public GameObject limbSegmentPrefab;
@@ -80,6 +80,7 @@ public class BodyGenerator : MonoBehaviour
         if (Time.time - moveTime < minJointSettlingTime || !jointsSettled)
         {
             jointsSettled = true;
+            chest.isKinematic = true;
             foreach (Rigidbody rBody in this.GetComponentsInChildren<Rigidbody>())
             {
                 //if any body parts are still flailing
@@ -91,25 +92,22 @@ public class BodyGenerator : MonoBehaviour
                 rBody.velocity = Vector3.zero;
                 rBody.angularVelocity = Vector3.zero;
                 LocalizeRigidbody(rBody, baseScale * 5);
-
-
+                
+                RefreshJointAnchors(rBody);
             }
 
+            if (jointsSettled)
+            {
+                chest.isKinematic = false;          
+            }
+        }
 
-            //Debug.Log(jointsSettled);
-            chest.isKinematic = true;
-            chest.MovePosition(transform.position);
-            chest.MoveRotation(transform.rotation);
-        }
-        else
-        {
-            chest.isKinematic = false;
-        }
     }
 
     public void MoveChest(Vector3 position)
     {
-        chest.MovePosition(position);
+        //chest.MovePosition(position);
+        chest.transform.localPosition = position;
         moveTime = Time.time;
         jointsSettled = false;
     }
@@ -193,6 +191,7 @@ public class BodyGenerator : MonoBehaviour
             originalAnchor = cJoint.anchor;
             originalConnectedBodyAnchor = cJoint.connectedAnchor;
         }
+
         if (defaultScales.ContainsKey(segment.name))
         {
             segment.transform.localScale = defaultScales[segment.name] * baseScale * relativeScale;
@@ -211,12 +210,32 @@ public class BodyGenerator : MonoBehaviour
         }
     }
 
-    public void ApplyDefaultScales()
+    public void RefreshJointAnchors(Rigidbody r)
+    {
+        ConfigurableJoint cJoint = r.GetComponent<ConfigurableJoint>();
+
+        if (cJoint != null)
+        {
+            Vector3 originalAnchor = cJoint.anchor;
+            Vector3 originalConnectedBodyAnchor = cJoint.connectedAnchor;
+
+            cJoint.anchor = originalAnchor;
+            cJoint.connectedAnchor = originalConnectedBodyAnchor;
+        }
+    }
+
+    public void ApplyDefaultRelativeScales()
     {
         foreach (Rigidbody r in GetComponentsInChildren<Rigidbody>())
         {
             ScaleSegment(r, 1.0f);
         }
+    }
+
+    public void ApplyNewBaseScale(float newScale)
+    {
+        baseScale = newScale;
+        ApplyDefaultRelativeScales();
     }
 
 
@@ -234,8 +253,8 @@ public class BodyGenerator : MonoBehaviour
         ScaleSegment(middleRbody, 1.0f);
         ScaleSegment(lowerRbody, 1.0f);
 
-        middleRbody.transform.rotation = Quaternion.Euler(new Vector3(-45f, 0f, 0f));
-        lowerRbody.transform.rotation = Quaternion.Euler(new Vector3(45f, 0f, 0f));
+        middleRbody.transform.rotation = Quaternion.Euler(new Vector3(-kneeAngularXLimitDefault, 0f, 0f));
+        lowerRbody.transform.rotation = Quaternion.Euler(new Vector3(ankleAngularXLimitDefault, 0f, 0f));
 
         ConfigurableJoint knee = ConnectWithJoint(middleRbody, upperRbody, "hinge");
         ConfigurableJoint ankle = ConnectWithJoint(lowerRbody, middleRbody, "hinge");

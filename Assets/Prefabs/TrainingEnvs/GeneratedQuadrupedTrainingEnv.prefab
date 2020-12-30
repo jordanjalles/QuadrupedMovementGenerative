@@ -276,7 +276,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2573156585093789087}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6758110994435022475}
@@ -294,12 +294,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc05bac93f458764c85cb1b28c562137, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseScale: 0.5
+  baseScale: 1
   density: 4
   positionSpringPower: 3000
-  positionDamperMultiplier: 5
-  maxSpringForce: 30
-  scaleForceByCrossSection: 0
+  positionDamperMultiplier: 2
+  maxSpringForce: 150
+  scaleForceByCrossSection: 1
   ballHighAngularXLimitDefault: 60
   ballLowAngularXLimitDefault: -60
   ballAngularYimitDefault: 30
@@ -307,6 +307,7 @@ MonoBehaviour:
   kneeAngularXLimitDefault: 30
   ankleAngularXLimitDefault: 20
   torsoAngularXLimitDefault: 10
+  jointsSettled: 0
   limbSegmentPrefab: {fileID: 2035216561820468858, guid: b6f5464f363383d47972f00b6e134ee9,
     type: 3}
   jointPrefab: {fileID: 1239690454118264645, guid: 244545e94479ce34995f251954036cb2,
@@ -353,9 +354,9 @@ MonoBehaviour:
   randomizeLegScales: 1
   minLegScale: 0.75
   maxLegScale: 1.25
-  randomizeGrossScale: 0
-  minGrossScale: 0.5
-  maxGrossScale: 2
+  randomizeGrossScale: 1
+  minGrossScale: 0.25
+  maxGrossScale: 1.25
   immortalMode: 0
   stateBasedModelSwitching: 0
   seekTargetModel: {fileID: 5022602860645237092, guid: b7d937ffff3d8974fbcca00ffdb3f78c,

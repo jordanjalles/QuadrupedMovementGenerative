@@ -67,11 +67,8 @@ public class MotionAgent : Agent
     void Start()
     {
         core = body.chest;
+        ResetLocation();
 
-        foreach (ConfigurableJoint cj in body.motorJoints)
-        {
-            SetJointDriveMaximumForce(cj, maxSpringForce);
-        }
     }
 
     private void Update()
@@ -115,14 +112,16 @@ public class MotionAgent : Agent
 
         //only change leg sizes if the episode was successful - counteracts the law of the jungle problem
         //Debug.Log(successfullEpisode + " successfullEpisode");
+        if (randomizeGrossScale && successfullEpisode)
+        {
+            //need to do gross scaling first because it overwrites leg rescaling
+            RandomizeGrossScale();
+        }
         if (randomizeLegScales && successfullEpisode)
         {
             RandomizeLegScales();
         }
-        if (randomizeGrossScale && successfullEpisode)
-        {
-            RandomizeGrossScale();
-        }
+        
         successfullEpisode = false;
     }
 
@@ -147,7 +146,7 @@ public class MotionAgent : Agent
     private void RandomizeGrossScale()
     {
         float newScale = Mathf.Lerp(minGrossScale, maxGrossScale, Random.value);
-        //scale the body...
+        body.ApplyNewBaseScale(newScale);
     }
 
 
@@ -191,7 +190,7 @@ public class MotionAgent : Agent
     private void ResetLocation()
     {
         
-        body.MoveChest(Vector3.zero);
+        body.MoveChest(new Vector3(0, body.baseScale*2, 0));
         core.transform.rotation = (Quaternion.identity);
         core.velocity = Vector3.zero;
         core.angularVelocity = Vector3.zero;
@@ -253,37 +252,9 @@ public class MotionAgent : Agent
     {
         Vector3 controlSignal = Vector3.zero;
         float forceSignal;
-        float minRotation;
-        float maxRotation;
 
         this.forceUsedPercent = 0f;
 
-        /*
-        //Debug.Log(vectorAction[0] + "vectorAction[0]");
-        for (int i = 0; i < body.motorJoints.Count; i++) {
-            ConfigurableJoint cJoint = body.motorJoints[i];
-
-            minRotation = cJoint.lowAngularXLimit.limit;
-            maxRotation = cJoint.highAngularXLimit.limit;
-            controlSignal.x = Mathf.Lerp(minRotation, maxRotation, Mathf.InverseLerp(-1, 1, vectorAction[(i * 4)]));
-
-            minRotation = -cJoint.angularYLimit.limit;
-            maxRotation = cJoint.angularYLimit.limit;
-            controlSignal.y = Mathf.Lerp(minRotation, maxRotation, Mathf.InverseLerp(-1, 1, vectorAction[(i * 4) + 1]));
-
-            minRotation = -cJoint.angularZLimit.limit;
-            maxRotation = cJoint.angularZLimit.limit;
-            controlSignal.z = Mathf.Lerp(minRotation, maxRotation, Mathf.InverseLerp(-1, 1, vectorAction[(i * 4) + 2]));
-
-            forceSignal = Mathf.InverseLerp(-1, 1, vectorAction[i * 4 + 3]);
-            forceUsedPercent += forceSignal / body.motorJoints.Count;
-
-            float maximumForce = maxSpringForce * forceSignal;
-            SetJointDriveMaximumForce(cJoint, maximumForce);
-
-            cJoint.targetRotation = Quaternion.Euler(controlSignal);
-        }*/
-        
         //replacement drive loop with body native functions
         for (int i = 0; i < body.motorJoints.Count; i++)
         {
@@ -329,7 +300,7 @@ public class MotionAgent : Agent
     private void SeekTargetReward()
     {
 
-        if (FallenDownConditions())
+        if (FallenDownConditions() && body.jointsSettled)
         {
             SetReward(-1.0f);
             if (!immortalMode)
