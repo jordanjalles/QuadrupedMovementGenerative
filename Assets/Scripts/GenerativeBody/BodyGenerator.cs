@@ -84,7 +84,7 @@ public class BodyGenerator : MonoBehaviour
             foreach (Rigidbody rBody in this.GetComponentsInChildren<Rigidbody>())
             {
                 //if any body parts are still flailing
-                if (rBody.velocity.magnitude > 3)
+                if (rBody.velocity.magnitude > 2)
                 {
                     jointsSettled = false;
                 }
@@ -95,11 +95,10 @@ public class BodyGenerator : MonoBehaviour
                 
                 RefreshJointAnchors(rBody);
             }
-
-            if (jointsSettled)
-            {
-                chest.isKinematic = false;          
-            }
+        }
+        else 
+        {
+            chest.isKinematic = false;
         }
 
     }
@@ -117,7 +116,8 @@ public class BodyGenerator : MonoBehaviour
     {
         if (r.transform.localPosition.magnitude > limit)
         {
-            r.MovePosition(this.transform.position);
+            
+            r.MovePosition(this.transform.position + (this.transform.InverseTransformPoint(r.transform.position)*0.25f));
         }
     }
 

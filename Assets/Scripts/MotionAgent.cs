@@ -67,6 +67,7 @@ public class MotionAgent : Agent
     void Start()
     {
         core = body.chest;
+
         ResetLocation();
 
     }
@@ -108,20 +109,23 @@ public class MotionAgent : Agent
     //etc...
     public override void OnEpisodeBegin()
     {
-        SetUpTrainingMode();
+
 
         //only change leg sizes if the episode was successful - counteracts the law of the jungle problem
-        //Debug.Log(successfullEpisode + " successfullEpisode");
-        if (randomizeGrossScale && successfullEpisode)
+        // mercy switch the unsuccessful bodies some percentage of the time
+        bool mercy = (Random.value < 0.3f);
+        
+        if (randomizeGrossScale && (successfullEpisode || mercy))
         {
             //need to do gross scaling first because it overwrites leg rescaling
             RandomizeGrossScale();
         }
-        if (randomizeLegScales && successfullEpisode)
+        if (randomizeLegScales && (successfullEpisode || mercy))
         {
             RandomizeLegScales();
         }
-        
+        SetUpTrainingMode();
+
         successfullEpisode = false;
     }
 
@@ -151,7 +155,7 @@ public class MotionAgent : Agent
 
 
 
-        private void SetUpTrainingMode()
+    private void SetUpTrainingMode()
     {
         if (rewardMode == RewardMode.StandUp)
         {
@@ -171,9 +175,8 @@ public class MotionAgent : Agent
                 target.gameObject.SetActive(true);
             }
 
-            if (FallenDownConditions())
+            if (FallenDownConditions() || core.isKinematic)
             {
-                
                 ResetLocation();
                 //face random direction
                 this.transform.rotation = (Quaternion.Euler(new Vector3(0, Random.value * 360, 0)));
@@ -300,7 +303,7 @@ public class MotionAgent : Agent
     private void SeekTargetReward()
     {
 
-        if (FallenDownConditions() && body.jointsSettled)
+        if (FallenDownConditions())
         {
             SetReward(-1.0f);
             if (!immortalMode)
@@ -331,24 +334,21 @@ public class MotionAgent : Agent
 
         float levelHorizon = Mathf.InverseLerp(minUpVectorDot, 1f, Vector3.Dot(core.transform.up, Vector3.up));
 
+        float rewardTierSize = 3.0f;
         float reward = 1;
 
-        reward *= facingTarget;
-        reward *= Mathf.Pow(vttl1, 2);
-        //reward *= efficiencyRollingAverage;
-        reward *= movementSmoothness;
-        //reward *= levelHorizon;
-
-        reward *= 4; //multiply the reward by # of limiting factors to increase signal
-
-        //DrawRedGreen(vttl1);
-        //Debug.Log("vttl1: " + vttl1);
-
+        //tiered reward factor inclusion
+        if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= facingTarget;
+        if (GetCumulativeReward() >= 1 * rewardTierSize) reward *= vttl1;
+        //if (GetCumulativeReward() >= 2 * rewardTierSize) reward *= movementSmoothness;
+        if (GetCumulativeReward() >= 3 * rewardTierSize) reward *= efficiencyRollingAverage;
+        if (GetCumulativeReward() >= 4 * rewardTierSize) reward *= vttl1;
 
         AddReward(reward); //reward for moving towards goal
         //Debug.Log("reward:" + reward);
 
         //Debug.Log(distanceToTarget);
+        //todo - make this based on actual collision.
         if (DistanceToTarget() < distanceToTouchTarget)
         {
             SetReward(1.0f);

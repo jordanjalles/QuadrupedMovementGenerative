@@ -294,11 +294,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc05bac93f458764c85cb1b28c562137, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseScale: 1
-  density: 4
+  baseScale: 0.25
+  density: 10
   positionSpringPower: 3000
-  positionDamperMultiplier: 2
-  maxSpringForce: 150
+  positionDamperMultiplier: 5
+  maxSpringForce: 500
   scaleForceByCrossSection: 1
   ballHighAngularXLimitDefault: 60
   ballLowAngularXLimitDefault: -60
@@ -344,7 +344,7 @@ MonoBehaviour:
   MaxStep: 1200
   positionSpringPower: 3000
   positionDamperMultiplier: 2
-  maxSpringForce: 30
+  maxSpringForce: 90
   body: {fileID: 2573156585093789083}
   target: {fileID: 6963610560090537797}
   minUpVectorDot: 0.5
@@ -355,11 +355,11 @@ MonoBehaviour:
   minLegScale: 0.75
   maxLegScale: 1.25
   randomizeGrossScale: 1
-  minGrossScale: 0.25
-  maxGrossScale: 1.25
+  minGrossScale: 0.15
+  maxGrossScale: 0.4
   immortalMode: 0
   stateBasedModelSwitching: 0
-  seekTargetModel: {fileID: 5022602860645237092, guid: b7d937ffff3d8974fbcca00ffdb3f78c,
+  seekTargetModel: {fileID: 5022602860645237092, guid: 2885c299700dffb409f6cb78ac58eab5,
     type: 3}
   standUpModel: {fileID: 5022602860645237092, guid: 44f537ab391d3c5479ecf55be2ee57d6,
     type: 3}
@@ -381,7 +381,7 @@ MonoBehaviour:
     VectorActionSize: 34000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
-  m_Model: {fileID: 5022602860645237092, guid: b7d937ffff3d8974fbcca00ffdb3f78c, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 2885c299700dffb409f6cb78ac58eab5, type: 3}
   m_InferenceDevice: 1
   m_BehaviorType: 0
   m_BehaviorName: QuadrupedMotionBehaviour
