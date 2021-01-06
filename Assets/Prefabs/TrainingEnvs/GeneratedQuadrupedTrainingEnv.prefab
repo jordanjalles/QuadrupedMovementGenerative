@@ -298,15 +298,15 @@ MonoBehaviour:
   density: 10
   positionSpringPower: 3000
   positionDamperMultiplier: 5
-  maxSpringForce: 500
+  maxSpringForce: 1000
   scaleForceByCrossSection: 1
   ballHighAngularXLimitDefault: 60
   ballLowAngularXLimitDefault: -60
   ballAngularYimitDefault: 30
   ballAngularZimitDefault: 10
-  kneeAngularXLimitDefault: 30
-  ankleAngularXLimitDefault: 20
-  torsoAngularXLimitDefault: 10
+  kneeAngularXLimitDefault: 45
+  ankleAngularXLimitDefault: 30
+  torsoAngularXLimitDefault: 15
   jointsSettled: 0
   limbSegmentPrefab: {fileID: 2035216561820468858, guid: b6f5464f363383d47972f00b6e134ee9,
     type: 3}
@@ -352,14 +352,14 @@ MonoBehaviour:
   targetDistanceRange: 18
   rewardMode: 0
   randomizeLegScales: 1
-  minLegScale: 0.75
+  minLegScale: 0.9
   maxLegScale: 1.25
   randomizeGrossScale: 1
-  minGrossScale: 0.15
+  minGrossScale: 0.25
   maxGrossScale: 0.4
   immortalMode: 0
   stateBasedModelSwitching: 0
-  seekTargetModel: {fileID: 5022602860645237092, guid: 2885c299700dffb409f6cb78ac58eab5,
+  seekTargetModel: {fileID: 5022602860645237092, guid: 8816c102506ba3a49b42b09a31db6655,
     type: 3}
   standUpModel: {fileID: 5022602860645237092, guid: 44f537ab391d3c5479ecf55be2ee57d6,
     type: 3}
@@ -376,12 +376,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 186
+    VectorObservationSize: 194
     NumStackedVectorObservations: 1
     VectorActionSize: 34000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
-  m_Model: {fileID: 5022602860645237092, guid: 2885c299700dffb409f6cb78ac58eab5, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 8816c102506ba3a49b42b09a31db6655, type: 3}
   m_InferenceDevice: 1
   m_BehaviorType: 0
   m_BehaviorName: QuadrupedMotionBehaviour

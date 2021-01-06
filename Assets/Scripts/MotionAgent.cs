@@ -218,7 +218,16 @@ public class MotionAgent : Agent
         sensor.AddObservation(core.transform.InverseTransformPoint(target.position).normalized);
         totalObservations += 3;
 
-        
+
+        sensor.AddObservation(core.transform.position);
+        totalObservations += 3;
+
+        sensor.AddObservation(core.velocity);
+        totalObservations += 3;
+
+        sensor.AddObservation(core.angularVelocity);
+        totalObservations += 3;
+
         //limb positions vec3 * 12
         //limb rotation vec3 * 12
         //limb touchign ground bool * 12
@@ -240,11 +249,6 @@ public class MotionAgent : Agent
             sensor.AddObservation(seg.GetComponent<TouchingGround>().touching);
             totalObservations += 1;
         }
-        
-        sensor.AddObservation(this.maxSpringForce);
-        totalObservations += 1;
-
-        //Debug.Log(totalObservations + " total observations");
 
 
     }
@@ -305,7 +309,7 @@ public class MotionAgent : Agent
 
         if (FallenDownConditions())
         {
-            SetReward(-1.0f);
+            SetReward(-(GetCumulativeReward()*0.9f));
             if (!immortalMode)
             {
                 successfullEpisode = false;
@@ -334,24 +338,29 @@ public class MotionAgent : Agent
 
         float levelHorizon = Mathf.InverseLerp(minUpVectorDot, 1f, Vector3.Dot(core.transform.up, Vector3.up));
 
-        float rewardTierSize = 3.0f;
-        float reward = 1;
+        float rewardTierSize = 1.0f;
+        float reward = 100;
 
         //tiered reward factor inclusion
         if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= facingTarget;
-        if (GetCumulativeReward() >= 1 * rewardTierSize) reward *= vttl1;
-        //if (GetCumulativeReward() >= 2 * rewardTierSize) reward *= movementSmoothness;
-        if (GetCumulativeReward() >= 3 * rewardTierSize) reward *= efficiencyRollingAverage;
-        if (GetCumulativeReward() >= 4 * rewardTierSize) reward *= vttl1;
+        if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= vttl1;
+        if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= vttl1;
+        if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= efficiencyRollingAverage;
+        if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= movementSmoothness;
+        
+        
 
         AddReward(reward); //reward for moving towards goal
-        //Debug.Log("reward:" + reward);
 
-        //Debug.Log(distanceToTarget);
-        //todo - make this based on actual collision.
+
         if (DistanceToTarget() < distanceToTouchTarget)
         {
-            SetReward(1.0f);
+            //reward for getting target multiplies current reward amount by ratio of time remaining.
+            //that's so we don't punish the quick runners
+
+            float stepsRemaining = MaxStep - StepCount;
+            SetReward(GetCumulativeReward()*(stepsRemaining / (float)StepCount));
+            
             successfullEpisode = true;
             EndEpisode();
         }
