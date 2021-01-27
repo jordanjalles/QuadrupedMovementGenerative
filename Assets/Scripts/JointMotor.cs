@@ -5,6 +5,8 @@ using UnityEngine;
 public class JointMotor
 {
     public enum ActivationMode { direct, oscillator }
+    private float internalTime;
+
 
     public void ActivateDirectJoint(ConfigurableJoint j, Vector3 rotationSignal, float forceMax, float forceSignal)
     {
@@ -32,34 +34,21 @@ public class JointMotor
     }
 
     //signals will vary between -1, 1
-    public static float DirectSignal(float min, float max, float amplitudeSignal)
+    public float DirectSignal(float min, float max, float amplitudeSignal)
     {
         return Mathf.Lerp(min, max, Mathf.InverseLerp(-1, 1, amplitudeSignal));
     }
 
-    public static float OscillateSignal(float min, float max, float phaseSignal, float frequencySignal,  float amplitudeSignal, float biasSignal)
+    public float OscillateSignal(float min, float max, float phaseSignal, float frequencySignal,  float amplitudeSignal, float biasSignal)
     {
         //remap signals to needed ranges
-        float frequency = Mathf.InverseLerp(-1.08f, 1, frequencySignal)+0f;
+        float frequency = Mathf.InverseLerp(-1f, 1, frequencySignal)*6f+1f;
         float amplitude = Mathf.InverseLerp(-1, 1, amplitudeSignal);
         float bias  = Mathf.InverseLerp(-1, 1, biasSignal);
-        
+        float phase = Mathf.InverseLerp(-1, 1, phaseSignal) * 6.28f;
 
-        
-        return Mathf.Lerp(min, max, Mathf.Clamp(Mathf.Sin((Time.time + phaseSignal) / frequency) * amplitude + bias, 0, 1));
+        internalTime += frequency * Time.deltaTime;
+
+        return Mathf.Lerp(min, max, Mathf.Clamp(Mathf.Sin((internalTime + phase)) * amplitude + bias, 0, 1));
     }
 }
-
-/*
-
-    private void SetJointDriveMaximumForce(ConfigurableJoint j, float newMaximumForce)
-    {
-        JointDrive jDrive = new JointDrive();
-        jDrive.maximumForce = newMaximumForce;
-        jDrive.positionSpring = this.positionSpringPower;
-        jDrive.positionDamper = this.maxSpringForce * positionDamperMultiplier;
-        j.slerpDrive = jDrive;
-    }
-
-}
-*/

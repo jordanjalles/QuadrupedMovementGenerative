@@ -1,0 +1,155 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2478422406586179354
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2478422406586179355}
+  - component: {fileID: 2478422406586179358}
+  - component: {fileID: 2478422406586179352}
+  - component: {fileID: 2478422406586179353}
+  - component: {fileID: 2478422406586179359}
+  m_Layer: 0
+  m_Name: GenerativeQuadruped01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2478422406586179355
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2478422406586179354}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2478422406586179358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2478422406586179354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc05bac93f458764c85cb1b28c562137, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseScale: 0.25
+  density: 10
+  positionSpringPower: 3000
+  positionDamperMultiplier: 10
+  maxSpringForce: 80
+  scaleForceByCrossSection: 1
+  ballHighAngularXLimitDefault: 90
+  ballLowAngularXLimitDefault: -90
+  ballAngularYimitDefault: 30
+  ballAngularZimitDefault: 10
+  kneeAngularXLimitDefault: -45
+  ankleAngularXLimitDefault: 30
+  torsoAngularXLimitDefault: 15
+  jointsSettled: 0
+  limbSegmentPrefab: {fileID: 2035216561820468858, guid: b6f5464f363383d47972f00b6e134ee9,
+    type: 3}
+  jointPrefab: {fileID: 1239690454118264645, guid: 244545e94479ce34995f251954036cb2,
+    type: 3}
+  bodyPrefab: {fileID: 3149386334461662111, guid: d432cc3a3324116468c8c169218bcac8,
+    type: 3}
+  headPrefab: {fileID: 255277685054341789, guid: 5f6b463ccd820c744aea081b66ef3b26,
+    type: 3}
+  tailPrefab: {fileID: 4221063544730445063, guid: 28a6a827cf29f274b9b1c152320e87fc,
+    type: 3}
+  chest: {fileID: 0}
+  hips: {fileID: 0}
+  limbs: []
+  torso: []
+  motorJoints: []
+  sensedSegments: []
+  frontLimbs: []
+  backLimbs: []
+--- !u!114 &2478422406586179352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2478422406586179354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d92a664e5cde6a4fa1ce8297b387103, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 1200
+  positionSpringPower: 3000
+  positionDamperMultiplier: 2
+  maxSpringForce: 90
+  body: {fileID: 2478422406586179358}
+  target: {fileID: 0}
+  minUpVectorDot: 0.5
+  distanceToTouchTarget: 2
+  targetDistanceRange: 18
+  rewardMode: 1
+  randomizeLegScales: 0
+  minLegScale: 0.9
+  maxLegScale: 1.25
+  randomizeGrossScale: 0
+  minGrossScale: 0.2
+  maxGrossScale: 0.4
+  immortalMode: 0
+  stateBasedModelSwitching: 0
+  seekTargetModel: {fileID: 5022602860645237092, guid: a0b1c83bf4c561345a964b2b49747622,
+    type: 3}
+  standUpModel: {fileID: 5022602860645237092, guid: a10353469e330dd41b52988669627e61,
+    type: 3}
+--- !u!114 &2478422406586179353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2478422406586179354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    VectorObservationSize: 191
+    NumStackedVectorObservations: 1
+    VectorActionSize: 34000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 1
+  m_Model: {fileID: 5022602860645237092, guid: a10353469e330dd41b52988669627e61, type: 3}
+  m_InferenceDevice: 1
+  m_BehaviorType: 0
+  m_BehaviorName: QuadrupedMotionBehaviour
+  TeamId: 0
+  m_UseChildSensors: 1
+--- !u!114 &2478422406586179359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2478422406586179354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 5
+  TakeActionsBetweenDecisions: 1

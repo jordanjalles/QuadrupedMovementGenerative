@@ -6,6 +6,8 @@ public class BodyGenerator : MonoBehaviour
     [Header("Physical attributes")]
     public float baseScale = 1f;
     public float density = 1f;
+    public float drag = 0.1f;
+    public float angularDrag = 0.1f;
 
     [Header("Joint drive settigs")]
     public float positionSpringPower = 3000;
@@ -55,11 +57,11 @@ public class BodyGenerator : MonoBehaviour
     [SerializeField]
     protected Dictionary<string, Vector3> defaultScales = new Dictionary<string, Vector3>()
     {
-        { "upper" ,  new Vector3(0.5f, 0.5f, 1f) },
-        { "middle" , new Vector3(0.3f, 0.3f, 1f) },
-        { "lower" , new Vector3(0.2f, 0.2f, 1f) },
+        { "upper" ,  new Vector3(0.25f, 0.75f, 0.75f) },
+        { "middle" , new Vector3(0.25f, 0.5f, 1f) },
+        { "lower" , new Vector3(0.25f, 0.25f, 1.25f) },
         { "chest" , new Vector3(1.5f, 1f, 1.5f) },
-        { "hips" , new Vector3(1.5f, 1f, 1.5f) }
+        { "hips" , new Vector3(1.25f, 1f, 1.25f) }
     };
 
     public virtual void Awake()
@@ -84,7 +86,7 @@ public class BodyGenerator : MonoBehaviour
             foreach (Rigidbody rBody in this.GetComponentsInChildren<Rigidbody>())
             {
                 //if any body parts are still flailing
-                if (rBody.velocity.magnitude > 2)
+                if (rBody.velocity.magnitude > 3)
                 {
                     jointsSettled = false;
                 }
@@ -253,7 +255,7 @@ public class BodyGenerator : MonoBehaviour
         ScaleSegment(middleRbody, 1.0f);
         ScaleSegment(lowerRbody, 1.0f);
 
-        middleRbody.transform.rotation = Quaternion.Euler(new Vector3(-kneeAngularXLimitDefault, 0f, 0f));
+        middleRbody.transform.rotation = Quaternion.Euler(new Vector3(kneeAngularXLimitDefault, 0f, 0f));
         lowerRbody.transform.rotation = Quaternion.Euler(new Vector3(ankleAngularXLimitDefault, 0f, 0f));
 
         ConfigurableJoint knee = ConnectWithJoint(middleRbody, upperRbody, "hinge");
@@ -280,11 +282,16 @@ public class BodyGenerator : MonoBehaviour
         return  limb;
     }
 
+
+    
     protected Rigidbody primitiveBodySegment()
     {
         GameObject segment = GameObject.CreatePrimitive(PrimitiveType.Cube);
         
         Rigidbody segmentRbody = segment.AddComponent<Rigidbody>();
+        segmentRbody.drag = drag;
+        segmentRbody.angularDrag = angularDrag;
+
         segment.transform.parent = this.transform;
         segment.transform.localPosition = Vector3.zero;
         segment.AddComponent(System.Type.GetType("TouchingGround" + ",Assembly-CSharp"));
@@ -299,6 +306,9 @@ public class BodyGenerator : MonoBehaviour
         GameObject segment = Instantiate(prefab, Vector3.zero, Quaternion.identity) ;
 
         Rigidbody segmentRbody = segment.AddComponent<Rigidbody>();
+        segmentRbody.drag = drag;
+        segmentRbody.angularDrag = angularDrag;
+
         segment.transform.parent = this.transform;
         segment.transform.localPosition = Vector3.zero;
         segment.AddComponent(System.Type.GetType("TouchingGround" + ",Assembly-CSharp"));
@@ -360,13 +370,13 @@ public class BodyGenerator : MonoBehaviour
         SetJointXLimits(j, ballLowAngularXLimitDefault, ballHighAngularXLimitDefault);
     }
 
-    protected void SetJointXLimits(ConfigurableJoint j, float lowXlimit, float highXlimit)
+    protected void SetJointXLimits(ConfigurableJoint j, float limit1, float limit2)
     {
         //can't set joint limits directly, so we need to create new objects for replacement
         SoftJointLimit lowAngularXLimit = new SoftJointLimit();
-        lowAngularXLimit.limit = lowXlimit;
+        lowAngularXLimit.limit = Mathf.Min(limit1, limit2);
         SoftJointLimit highAngularXLimit = new SoftJointLimit();
-        highAngularXLimit.limit = highXlimit;
+        highAngularXLimit.limit = Mathf.Max(limit1, limit2);
 
         //replace limits
         j.lowAngularXLimit = lowAngularXLimit;
@@ -389,6 +399,8 @@ public class BodyGenerator : MonoBehaviour
     }
     public void DriveJoint(ConfigurableJoint cJoint, Vector3 direction, float effort)
     {
+        
+
         Vector3 constrainedDirection = Vector3.zero;
         constrainedDirection.x = Mathf.Lerp(cJoint.lowAngularXLimit.limit, cJoint.highAngularXLimit.limit, direction.x);
         constrainedDirection.y = Mathf.Lerp(-cJoint.angularYLimit.limit, cJoint.angularYLimit.limit, direction.y);
@@ -404,6 +416,7 @@ public class BodyGenerator : MonoBehaviour
         }
 
         SetJointDriveMaximumForce(cJoint, newForce);
+        
     }
 
 

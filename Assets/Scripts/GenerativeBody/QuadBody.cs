@@ -10,8 +10,6 @@ public class QuadBody : BodyGenerator
     public List<Rigidbody> backLimbs;
     [HideInInspector]
 
-
-
     /*
     [Range(0.5f, 1f)]
     public float backLegsSizeMin;
@@ -28,10 +26,10 @@ public class QuadBody : BodyGenerator
         Rigidbody limbBL = CreateTwoJointLimb()[0];
         Rigidbody limbBR = CreateTwoJointLimb()[0];
 
-        ConnectAngledLimb(limbFL, hips, new Vector3(-90f, 180f, 0f), new Vector3(0.5f, 0f, 0.5f));
-        ConnectAngledLimb(limbFR, hips, new Vector3(-90f, 180f, 0f), new Vector3(-0.5f, 0f, 0.5f));
+        ConnectAngledLimb(limbFL, hips, new Vector3(-90f, 0f, 0f), new Vector3(0.4f, 0f, 0.4f));
+        ConnectAngledLimb(limbFR, hips, new Vector3(-90f, 0f, 0f), new Vector3(-0.4f, 0f, 0.4f));
 
-        ConnectAngledLimb(limbBL, chest, new Vector3(-90f, 0f, 0f), new Vector3(0.5f, 0f, -0.5f));
-        ConnectAngledLimb(limbBR, chest, new Vector3(-90f, 0f, 0f), new Vector3(-0.5f, 0f, -0.5f));
+        ConnectAngledLimb(limbBL, chest, new Vector3(-90f, 0f, 0f), new Vector3(0.4f, 0f, -0.4f));
+        ConnectAngledLimb(limbBR, chest, new Vector3(-90f, 0f, 0f), new Vector3(-0.4f, 0f, -0.4f));
     }
 }

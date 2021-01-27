@@ -137,7 +137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &256700915
 Transform:
   m_ObjectHideFlags: 0
@@ -165,24 +165,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseScale: 1
-  highAngularXLimitDefault: 60
-  lowAngularXLimitDefault: -60
-  angularYimitDefault: 30
-  angularZimitDefault: 10
+  density: 1
+  positionSpringPower: 3000
+  positionDamperMultiplier: 2
+  maxSpringForce: 30
+  scaleForceByCrossSection: 0
+  ballHighAngularXLimitDefault: 60
+  ballLowAngularXLimitDefault: 60
+  ballAngularYimitDefault: 30
+  ballAngularZimitDefault: 10
+  kneeAngularXLimitDefault: 30
+  ankleAngularXLimitDefault: 20
+  torsoAngularXLimitDefault: 10
+  jointsSettled: 0
   limbSegmentPrefab: {fileID: 2035216561820468858, guid: b6f5464f363383d47972f00b6e134ee9,
     type: 3}
   jointPrefab: {fileID: 1239690454118264645, guid: 244545e94479ce34995f251954036cb2,
     type: 3}
   bodyPrefab: {fileID: 3149386334461662111, guid: d432cc3a3324116468c8c169218bcac8,
     type: 3}
+  headPrefab: {fileID: 0}
+  tailPrefab: {fileID: 0}
   chest: {fileID: 0}
   hips: {fileID: 0}
   limbs: []
-  torsoParts: []
+  torso: []
+  motorJoints: []
+  sensedSegments: []
   frontLimbs: []
   backLimbs: []
-  backLegsSizeMin: 0
-  backLegsSizeMax: 0
 --- !u!1 &442319174
 GameObject:
   m_ObjectHideFlags: 0
@@ -578,7 +589,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &763313822
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -594,7 +605,7 @@ MonoBehaviour:
   directSignal: 0
   phaseSignal: -0.501
   amplitudeSignal: 0
-  frequencySignal: -0.515
+  frequencySignal: -0.04
   biasSignal: 0
 --- !u!4 &763313823
 Transform:

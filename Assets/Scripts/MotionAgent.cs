@@ -27,7 +27,7 @@ public class MotionAgent : Agent
     private float targetDistanceRange = 18f;
 
     
-    public enum RewardMode {SeekTarget, StandUp};
+    public enum RewardMode {SeekTarget, StandUp, StayStanding};
     [Header("Training settings")]
     [SerializeField]
     private RewardMode rewardMode;
@@ -54,26 +54,43 @@ public class MotionAgent : Agent
 
     //Used for reward calculations
     private bool successfullEpisode = true;
+    private bool slashedRewards = false;
     private float efficiencyRollingAverage = 0;
     private float efficiencyRollingAverageDepth = 10; 
     private Vector3 velocityRollingAverage = Vector3.zero;
     private float velocityRollingAverageDepth = 20;
+    private float velocityTowardsTargetRollingAverage;
+    private float vttraDepth = 50;
+
     private bool touchingGroundOtherThanFeet = false;
     private float forceUsedPercent = 0;
+    private float[] previousVectorActions;
 
-   
-
+    [Header("Stay Standing Training Settings")]
     
+    [SerializeField]
+    private float impulseStartForce;
+    private float numImpulses = 0;
+    [SerializeField]
+    private float timeBetweenImpulses = 3;
+    private float prevImpulseTime = 0;
+
+
+
+
     void Start()
     {
         core = body.chest;
 
         ResetLocation();
+        RandomizeTargetLocation();
 
     }
 
     private void Update()
     {
+        //todo: add stay standing intermediary with timer
+
         if (stateBasedModelSwitching)
         {
             if (rewardMode == RewardMode.StandUp)
@@ -113,7 +130,7 @@ public class MotionAgent : Agent
 
         //only change leg sizes if the episode was successful - counteracts the law of the jungle problem
         // mercy switch the unsuccessful bodies some percentage of the time
-        bool mercy = (Random.value < 0.3f);
+        bool mercy = (Random.value < 0.2f);
         
         if (randomizeGrossScale && (successfullEpisode || mercy))
         {
@@ -127,6 +144,7 @@ public class MotionAgent : Agent
         SetUpTrainingMode();
 
         successfullEpisode = false;
+        slashedRewards = false;
     }
 
     private void RandomizeLegScales()
@@ -164,8 +182,10 @@ public class MotionAgent : Agent
                 target.gameObject.SetActive(false);
             }
             ResetLocation();
+            body.MoveChest(new Vector3(0, body.baseScale * 2, 0));
             //flip around to random rotation
-            this.transform.rotation = (Quaternion.Euler(new Vector3(0f, Random.value * 360, 90 + Random.value * 180)));
+            core.transform.rotation = (Quaternion.Euler(new Vector3(180f, Random.value * 360, (Random.value - 0.5f) * 180f)));
+
         }
 
         if (rewardMode == RewardMode.SeekTarget)
@@ -173,6 +193,7 @@ public class MotionAgent : Agent
             if (!target.gameObject.activeSelf)
             {
                 target.gameObject.SetActive(true);
+
             }
 
             if (FallenDownConditions() || core.isKinematic)
@@ -187,6 +208,26 @@ public class MotionAgent : Agent
                 RandomizeTargetLocation();
             }
         }
+        if (rewardMode == RewardMode.StayStanding)
+        {
+            ResetLocation();
+            RandomizeTargetLocation();
+            numImpulses = 0;
+
+            //face random direction
+            this.transform.rotation = (Quaternion.Euler(new Vector3(0, Random.value * 360, 0)));
+
+            if (!target.gameObject.activeSelf)
+            {
+                target.gameObject.SetActive(true);
+               
+            }
+
+            while (DistanceToTarget() < distanceToTouchTarget * 2)
+            {
+                RandomizeTargetLocation();
+            }
+        }
 
     }
 
@@ -194,7 +235,7 @@ public class MotionAgent : Agent
     {
         
         body.MoveChest(new Vector3(0, body.baseScale*2, 0));
-        core.transform.rotation = (Quaternion.identity);
+        core.transform.localRotation = (Quaternion.identity);
         core.velocity = Vector3.zero;
         core.angularVelocity = Vector3.zero;
     }
@@ -208,19 +249,14 @@ public class MotionAgent : Agent
     {
         return (touchingGroundOtherThanFeet || Vector3.Dot(core.transform.up, Vector3.up) < minUpVectorDot);
     }
-
-    
     public override void CollectObservations(VectorSensor sensor)
     {
         int totalObservations = 0;
         
-        //target position vec3
+        //target direction vec3
         sensor.AddObservation(core.transform.InverseTransformPoint(target.position).normalized);
         totalObservations += 3;
 
-
-        sensor.AddObservation(core.transform.position);
-        totalObservations += 3;
 
         sensor.AddObservation(core.velocity);
         totalObservations += 3;
@@ -262,6 +298,13 @@ public class MotionAgent : Agent
 
         this.forceUsedPercent = 0f;
 
+
+        float averageSignalDiff = DifferenceBetweenSignalVectors(previousVectorActions, vectorAction)/vectorAction.Length;
+        float actionStability = 1 - (averageSignalDiff / 2);
+        
+
+        this.previousVectorActions = vectorAction;
+
         //replacement drive loop with body native functions
         for (int i = 0; i < body.motorJoints.Count; i++)
         {
@@ -282,15 +325,27 @@ public class MotionAgent : Agent
         if (rewardMode == RewardMode.StandUp)
         {
             StandUpReward();
+        }        
+        
+        if (rewardMode == RewardMode.StayStanding)
+        {
+            StayStandingReward();
         }
     }
 
     private void StandUpReward()
     {
 
+        float reward = 1f;
+
+
+
         if (FallenDownConditions() == false)
         {
-            AddReward(10f);
+            float stepsRemaining = MaxStep - StepCount;
+            //SetReward((stepsRemaining / ((float)StepCount+1f)));
+
+            SetReward(100f * (stepsRemaining / MaxStep));
             if (!immortalMode)
             {
                 successfullEpisode = true;
@@ -298,60 +353,34 @@ public class MotionAgent : Agent
             }
         }
 
-        float reward = 0.0f;
-        float upVectorSignal = Mathf.InverseLerp(-1, 1, (Vector3.Dot(core.transform.up, Vector3.up))) * 0.2f;
-        reward += Mathf.Pow(upVectorSignal, 4);
+        //still rougly gettingup
+
+
+        float upRightNess = (Vector3.Dot(core.transform.up, Vector3.up));
+
+        reward *= Mathf.Pow(upRightNess, 4) * 0.01f * Mathf.Sign(upRightNess);
+        reward *= CheckNumberOfFeetTouchingGround() + 1;
+
         AddReward(reward);
     }
 
     private void SeekTargetReward()
     {
+        
 
         if (FallenDownConditions())
         {
-            SetReward(-(GetCumulativeReward()*0.9f));
+            SetReward(-10f);
+
             if (!immortalMode)
             {
                 successfullEpisode = false;
                 EndEpisode();
+                return;
+                
             }
+            //Debug.Log(GetCumulativeReward());
         }
-
-        float efficiency = (1 - forceUsedPercent);
-        efficiencyRollingAverage = (efficiencyRollingAverage + (efficiency / efficiencyRollingAverageDepth)) / (1 + 1f / efficiencyRollingAverageDepth);
-        //Debug.Log("e:" + efficiency + " era" + efficiencyRollingAverage.ToString());
-
-        velocityRollingAverage = (velocityRollingAverage + (core.velocity / velocityRollingAverageDepth)) / (1 + 1f / velocityRollingAverageDepth);
-        float velocityDeltaFromAverage = (velocityRollingAverage - core.velocity).magnitude;
-        float movementSmoothness = 1 - (float)System.Math.Tanh(velocityDeltaFromAverage * 2f);
-
-
-        //0 is away from target, 1 is towards target
-        float facingTarget = Mathf.InverseLerp(-1, 1, GetFacingTarget());
-        //float facingTargetPow2 = Mathf.Pow(facingTarget, 2);
-
-        float velocityTowardsTarget = core.velocity.magnitude * Vector3.Dot(core.velocity.normalized, (target.position - core.transform.position).normalized);
-        //velocity towards target limit 1
-        float vttl1 = Mathf.Max((float)System.Math.Tanh(velocityTowardsTarget * 0.25f), 0);
-        
-        //DrawRedGreen(Mathf.Pow(vttl1, 2));
-
-        float levelHorizon = Mathf.InverseLerp(minUpVectorDot, 1f, Vector3.Dot(core.transform.up, Vector3.up));
-
-        float rewardTierSize = 1.0f;
-        float reward = 100;
-
-        //tiered reward factor inclusion
-        if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= facingTarget;
-        if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= vttl1;
-        if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= vttl1;
-        if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= efficiencyRollingAverage;
-        if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= movementSmoothness;
-        
-        
-
-        AddReward(reward); //reward for moving towards goal
-
 
         if (DistanceToTarget() < distanceToTouchTarget)
         {
@@ -359,16 +388,129 @@ public class MotionAgent : Agent
             //that's so we don't punish the quick runners
 
             float stepsRemaining = MaxStep - StepCount;
-            SetReward(GetCumulativeReward()*(stepsRemaining / (float)StepCount));
-            
+            AddReward((GetCumulativeReward() * (stepsRemaining / StepCount)));
+
             successfullEpisode = true;
             EndEpisode();
+            //return;
         }
+
+
+        float efficiency = (1 - forceUsedPercent);
+        efficiencyRollingAverage = (efficiencyRollingAverage + (efficiency / efficiencyRollingAverageDepth)) / (1 + 1f / efficiencyRollingAverageDepth);
+
+        /*
+        velocityRollingAverage = (velocityRollingAverage + (core.velocity / velocityRollingAverageDepth)) / (1 + 1f / velocityRollingAverageDepth);
+        float velocityDeltaFromAverage = (velocityRollingAverage - core.velocity).magnitude;
+        float movementSmoothness = 1 - (float)System.Math.Tanh(velocityDeltaFromAverage * 2f);
+        */
+
+        //0 is away from target, 1 is towards target
+        float facingTarget = Mathf.InverseLerp(-1, 1, GetFacingTarget());
+       
+
+        float velocityTowardsTarget = core.velocity.magnitude * Vector3.Dot(core.velocity.normalized, (target.position - core.transform.position).normalized);
+        //velocityTowardsTarget = Mathf.Max(velocityTowardsTarget, 0);
+
+        velocityTowardsTargetRollingAverage = (velocityTowardsTargetRollingAverage + (velocityTowardsTarget / vttraDepth))/(1 + 1f/ vttraDepth);
+        velocityTowardsTargetRollingAverage = Mathf.Max(velocityTowardsTargetRollingAverage, 0);
+
+        float forwardVelocity = (-core.transform.InverseTransformDirection(core.velocity).z);
+
+        float levelHorizon = Mathf.InverseLerp(minUpVectorDot, 1f, Vector3.Dot(core.transform.up, Vector3.up));
+
+        float rewardTierSize = 1.0f;
+        float reward = 1;
+
+        //tiered reward factor inclusion
+        reward *= Mathf.Pow(facingTarget,2);
+        reward *= forwardVelocity;
+        
+        if (reward >= 0) reward *= efficiencyRollingAverage;
+
+        //if (GetCumulativeReward() >= 0 * rewardTierSize) reward *= movementSmoothness;
+
+        AddReward(reward); //reward for moving towards goal
+
+        DrawRedGreen(reward);
+        
+        if (reward < 0)
+        {
+            Debug.LogWarning("Reward somehow less than zero: " + reward);
+        }
+
+
+    }
+    private void StayStandingReward()
+    {
+
+        
+        if (CheckTouchingGroundOtherThanFeet())
+        {
+            SetReward(-0.1f);
+            DrawRedGreen(-1f);
+            if (GetCumulativeReward() < -10)
+            {
+                EndEpisode();
+            }
+        }
+        else
+        {
+            if (Time.time - prevImpulseTime > timeBetweenImpulses)
+            {
+                numImpulses += 1;
+                prevImpulseTime = Time.time;
+                Vector3 forceDirection = new Vector3(Random.value - 0.5f, Random.value - 0.5f, Random.value - 0.5f).normalized;
+                Vector3 force = forceDirection * impulseStartForce * numImpulses;
+                Debug.Log(force);
+
+                core.AddForce(force, ForceMode.Impulse);
+            }
+
+            float uprightness = Vector3.Dot(core.transform.up, Vector3.up);
+
+            float efficiency = (1 - forceUsedPercent);
+
+            //0 is away from target, 1 is towards target
+            float facingTarget = Mathf.InverseLerp(-1, 1, GetFacingTarget());
+
+            float stillness = 1f - (float)System.Math.Tanh(core.velocity.magnitude);
+
+            float reward = 1;
+
+            reward *= uprightness;
+            reward *= efficiency;
+            reward *= facingTarget;
+            reward *= facingTarget;
+            reward *= stillness;
+
+            SetReward(reward); //reward for moving towards goal
+
+            DrawRedGreen(reward);
+        }
+
+
+
     }
     private float DistanceToTarget()
     {
         return Vector3.Distance(core.transform.position, target.position);
     }
+
+    private float DifferenceBetweenSignalVectors(float[] vectorAction1, float[] vectorAction2)
+    {
+        float diff = 0f;
+
+        if (vectorAction1 != null && vectorAction2 != null)
+        {
+            for( int i = 0; i < vectorAction1.Length; i++)
+            {
+                diff += Mathf.Abs(vectorAction1[i] - vectorAction2[i]);
+            }
+        }
+        return diff;
+    }
+
     private void DrawRedGreen(float reward)
     {
 
@@ -390,25 +532,15 @@ public class MotionAgent : Agent
                 rend.material.SetColor("_BaseColor", c);
             }
         }
-
-
-    }
-
-    private void SetJointDriveMaximumForce(ConfigurableJoint cJoint, float newMaximumForce)
-    {
-        JointDrive jDrive = new JointDrive();
-        jDrive.maximumForce = newMaximumForce;
-        jDrive.positionSpring = this.positionSpringPower;
-        jDrive.positionDamper = this.maxSpringForce * positionDamperMultiplier;
-        cJoint.slerpDrive = jDrive;
     }
 
     public override void Heuristic(float[] actionsOut)
     {
         for (int i = 0; i < actionsOut.Length; i++)
         {
-            float v = Mathf.InverseLerp(-1, 1, Input.GetAxis("Horizontal"));
-            float h = Mathf.InverseLerp(-1, 1, Input.GetAxis("Vertical"));
+
+            float v = Input.GetAxis("Horizontal");
+            float h = Input.GetAxis("Vertical");
             actionsOut[i] = (i % 2 == 0) ? v : h;
         }
     }
@@ -438,5 +570,21 @@ public class MotionAgent : Agent
             }
         }
         return touchingGroundOtherThanFeet;
+    }
+
+    private int CheckNumberOfFeetTouchingGround()
+    {
+        int feetTouchingGround = 0;
+        foreach (Rigidbody seg in body.sensedSegments)
+        {
+            if (seg.GetComponent<TouchingGround>().touching == true)
+            {
+                if (seg.name == "lower")
+                {
+                    feetTouchingGround += 1;
+                }
+            }
+        }
+        return feetTouchingGround;
     }
 }
