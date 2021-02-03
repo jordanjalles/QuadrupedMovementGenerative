@@ -86,7 +86,7 @@ public class BodyGenerator : MonoBehaviour
             foreach (Rigidbody rBody in this.GetComponentsInChildren<Rigidbody>())
             {
                 //if any body parts are still flailing
-                if (rBody.velocity.magnitude > 3)
+                if (rBody.velocity.magnitude > 5)
                 {
                     jointsSettled = false;
                 }

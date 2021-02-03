@@ -2316,6 +2316,33 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2312306936657280968, guid: a36a617af15c3fa42b6d71750afb3e21,
+        type: 3}
+      propertyPath: immortalMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2312306936657280968, guid: a36a617af15c3fa42b6d71750afb3e21,
+        type: 3}
+      propertyPath: stateBasedModelSwitching
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2312306936657280968, guid: a36a617af15c3fa42b6d71750afb3e21,
+        type: 3}
+      propertyPath: rewardMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2312306936657280968, guid: a36a617af15c3fa42b6d71750afb3e21,
+        type: 3}
+      propertyPath: seekTargetModel
+      value: 
+      objectReference: {fileID: 5022602860645237092, guid: df536b5b215999f41bb8998fa0cde47b,
+        type: 3}
+    - target: {fileID: 2312306936657280969, guid: a36a617af15c3fa42b6d71750afb3e21,
+        type: 3}
+      propertyPath: m_Model
+      value: 
+      objectReference: {fileID: 5022602860645237092, guid: bd4d1cc8c79183e4385c5ed92bfea417,
+        type: 3}
     - target: {fileID: 3640287972938423519, guid: a36a617af15c3fa42b6d71750afb3e21,
         type: 3}
       propertyPath: m_Name

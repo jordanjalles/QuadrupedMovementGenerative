@@ -6,9 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: d1c3109bdb54ad54c8a2b2838528e640
-  - enabled: 1
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
     path: Assets/Scenes/QuadrupedTrainer.unity
     guid: 7047bfce49f35c543b4b29f5074f427a
+  - enabled: 1
+    path: Assets/Scenes/ControlQuadruped.unity
+    guid: 5df8776f165550c4c92b697619c70931
   m_configObjects: {}
