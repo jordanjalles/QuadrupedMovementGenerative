@@ -52,6 +52,8 @@ public class BodyGenerator : MonoBehaviour
     public List<ConfigurableJoint> motorJoints = new List<ConfigurableJoint>();
     [HideInInspector]
     public List<Rigidbody> sensedSegments = new List<Rigidbody>();
+    [HideInInspector]
+    public List<Rigidbody> feet = new List<Rigidbody>();
 
     [Header("Default body part scales")]
     [SerializeField]
@@ -212,6 +214,26 @@ public class BodyGenerator : MonoBehaviour
         }
     }
 
+    public void ResetAnchorsInRigidbody(Rigidbody r)
+    {
+        foreach (Joint j in r.GetComponentsInChildren<Joint>())
+        {
+            RefreshAnchors(j);
+        }
+    }
+
+    public void RefreshAnchors(Joint joint)
+    {
+        Vector3 originalAnchor = Vector3.zero;
+        Vector3 originalConnectedBodyAnchor = Vector3.zero;
+
+        originalAnchor = joint.anchor;
+        originalConnectedBodyAnchor = joint.connectedAnchor;
+
+        joint.anchor = originalAnchor;
+        joint.connectedAnchor = originalConnectedBodyAnchor;
+    }
+
     public void RefreshJointAnchors(Rigidbody r)
     {
         ConfigurableJoint cJoint = r.GetComponent<ConfigurableJoint>();
@@ -264,20 +286,23 @@ public class BodyGenerator : MonoBehaviour
         SetJointXLimits(knee, -kneeAngularXLimitDefault, kneeAngularXLimitDefault);
         SetJointXLimits(ankle, -ankleAngularXLimitDefault, ankleAngularXLimitDefault);
 
+        limbs.Add(upperRbody);
+        limbs.Add(middleRbody);
+        limbs.Add(lowerRbody);
+
+        feet.Add(lowerRbody);
+
+        sensedSegments.Add(upperRbody);
+        sensedSegments.Add(middleRbody);
+        sensedSegments.Add(lowerRbody);
+
         List<Rigidbody> limb = new List<Rigidbody>();
 
         limb.Add(upperRbody);
         limb.Add(middleRbody);
         limb.Add(lowerRbody);
-        
 
-        limbs.Add(upperRbody);
-        limbs.Add(middleRbody);
-        limbs.Add(lowerRbody);
 
-        sensedSegments.Add(upperRbody);
-        sensedSegments.Add(middleRbody);
-        sensedSegments.Add(lowerRbody);
 
         return  limb;
     }
@@ -303,9 +328,17 @@ public class BodyGenerator : MonoBehaviour
 
     protected Rigidbody PrefabBodySegment(GameObject prefab)
     {
-        GameObject segment = Instantiate(prefab, Vector3.zero, Quaternion.identity) ;
+        GameObject segment = Instantiate(prefab, Vector3.zero, Quaternion.identity);
 
-        Rigidbody segmentRbody = segment.AddComponent<Rigidbody>();
+        Rigidbody segmentRbody;
+        if (segment.GetComponent<Rigidbody>() == null) { 
+            segmentRbody = segment.AddComponent<Rigidbody>();
+        }
+        else
+        {
+            segmentRbody = segment.GetComponent<Rigidbody>();
+        }
+    
         segmentRbody.drag = drag;
         segmentRbody.angularDrag = angularDrag;
 
@@ -339,6 +372,11 @@ public class BodyGenerator : MonoBehaviour
             SetUpHingeJoint(joint);
         }
 
+        if (jointType == "fixed")
+        {
+            SetUpFixedJoint(joint);
+        }
+
         return joint;
 
     }
@@ -368,6 +406,17 @@ public class BodyGenerator : MonoBehaviour
         j.angularZMotion = ConfigurableJointMotion.Locked;
 
         SetJointXLimits(j, ballLowAngularXLimitDefault, ballHighAngularXLimitDefault);
+    }
+
+    protected void SetUpFixedJoint(ConfigurableJoint j)
+    {
+        //ball joint
+        j.xMotion = ConfigurableJointMotion.Locked;
+        j.yMotion = ConfigurableJointMotion.Locked;
+        j.zMotion = ConfigurableJointMotion.Locked;
+        j.angularXMotion = ConfigurableJointMotion.Locked;
+        j.angularYMotion = ConfigurableJointMotion.Locked;
+        j.angularZMotion = ConfigurableJointMotion.Locked;
     }
 
     protected void SetJointXLimits(ConfigurableJoint j, float limit1, float limit2)
@@ -438,10 +487,48 @@ public class BodyGenerator : MonoBehaviour
         rb.mass = rb.transform.localScale.x * rb.transform.localScale.y * rb.transform.localScale.z * density;
     }
 
+    public Vector3 CenterOfMass()
+    {
+        Vector3 centerOfMass = Vector3.zero;
+
+        float totalMass = TotalMass();
+        
+        foreach (Rigidbody part in sensedSegments)
+        {
+            centerOfMass += part.transform.position * (part.mass/totalMass);
+        }
+
+        return centerOfMass;
+    }
+
+    public Vector3 AverageFootPosition()
+    {
+        Vector3 averagePos = Vector3.zero;
+
+        for (int i = 0; i < feet.Count; i++)
+        {
+            averagePos += feet[i].position / feet.Count;
+        }
+
+        return averagePos;
+
+    }
+
+    public float TotalMass()
+    {
+        float m = 0;
+        foreach (Rigidbody r in sensedSegments)
+        {
+            m += r.mass;
+        }
+
+        return m;
+    }
+
 
     protected void SetAllMassesByVolume()
     {
-        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
+        foreach (Rigidbody rb in sensedSegments)
         {
             SetMassByVolume(rb);
         }

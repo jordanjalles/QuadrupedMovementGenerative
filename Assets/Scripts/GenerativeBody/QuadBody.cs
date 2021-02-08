@@ -9,6 +9,9 @@ public class QuadBody : BodyGenerator
     [HideInInspector]
     public List<Rigidbody> backLimbs;
     [HideInInspector]
+    public Rigidbody head;
+    [HideInInspector]
+    public Rigidbody tail;
 
     /*
     [Range(0.5f, 1f)]
@@ -31,5 +34,15 @@ public class QuadBody : BodyGenerator
 
         ConnectAngledLimb(limbBL, chest, new Vector3(-90f, 0f, 0f), new Vector3(0.4f, 0f, -0.4f));
         ConnectAngledLimb(limbBR, chest, new Vector3(-90f, 0f, 0f), new Vector3(-0.4f, 0f, -0.4f));
+
+        /*
+        head = PrefabBodySegment(headPrefab);
+        ConnectWithJoint(head, chest,  "fixed");
+
+        
+        tail = PrefabBodySegment(tailPrefab);
+        ConnectWithJoint(hips, tail,  "fixed");
+        */
+
     }
 }

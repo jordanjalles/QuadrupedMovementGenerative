@@ -43,6 +43,8 @@ public class MotionAgent : Agent
     private float minGrossScale;
     [SerializeField]
     private float maxGrossScale;
+    [SerializeField]
+    public float standUpSuccessSeconds = 1f;
 
     [Header("Demonstration settings")]
     [SerializeField]
@@ -51,9 +53,10 @@ public class MotionAgent : Agent
     private bool immortalMode = false;
     [SerializeField]
     private bool stateBasedModelSwitching = false;
-    public Unity.Barracuda.NNModel seekTargetModel;
     public Unity.Barracuda.NNModel standUpModel;
     public Unity.Barracuda.NNModel stayStandingModel;
+    public List<Unity.Barracuda.NNModel> seekTargetModels;
+    private int currentSeekTargetModelIndex = 0;
 
     //Used for reward calculations
     private bool successfullEpisode = true;
@@ -61,7 +64,7 @@ public class MotionAgent : Agent
     private float efficiencyRollingAverage = 0;
     private float efficiencyRollingAverageDepth = 10; 
     private Vector3 velocityRollingAverage = Vector3.zero;
-    private float velocityRollingAverageDepth = 20;
+    private float velocityRollingAverageDepth = 10;
     private float velocityTowardsTargetRollingAverage;
     private float vttraDepth = 50;
     private bool standingUp = false;
@@ -71,7 +74,7 @@ public class MotionAgent : Agent
     private float forceUsedPercent = 0;
     private float[] previousVectorActions;
 
-    public float standUpSuccessSeconds = 1f;
+    
 
     [Header("Stay Standing Training Settings")]
     
@@ -111,7 +114,7 @@ public class MotionAgent : Agent
                 {
                     
                     rewardMode = RewardMode.SeekTarget;
-                    this.SetModel("AdvancedQuadrupedBehavior", seekTargetModel);
+                    this.SetModel("AdvancedQuadrupedBehavior", seekTargetModels[0]);
                     
                 }
             }else if (rewardMode == RewardMode.SeekTarget)
@@ -132,7 +135,7 @@ public class MotionAgent : Agent
         if (newRewardMode == RewardMode.SeekTarget)
         {
             this.rewardMode = newRewardMode;
-            this.SetModel("AdvancedQuadrupedBehavior", seekTargetModel);
+            this.SetModel("AdvancedQuadrupedBehavior", seekTargetModels[currentSeekTargetModelIndex]);
         }        
         if (newRewardMode == RewardMode.StayStanding)
         {
@@ -404,7 +407,7 @@ public class MotionAgent : Agent
         reward *= CheckNumberOfFeetTouchingGround() + 1;
 
         AddReward(reward);
-        DrawRedGreen(reward);
+        DrawRedGreen(reward*100);
 
 
 
@@ -444,13 +447,21 @@ public class MotionAgent : Agent
         }
 
         //prepare the ingredients
-
         float efficiency = (1 - forceUsedPercent);
         efficiencyRollingAverage = (efficiencyRollingAverage + (efficiency / efficiencyRollingAverageDepth)) / (1 + 1f / efficiencyRollingAverageDepth);
        
         velocityRollingAverage = (velocityRollingAverage + (core.velocity / velocityRollingAverageDepth)) / (1 + 1f / velocityRollingAverageDepth);
         float velocityDeltaFromAverage = (velocityRollingAverage - core.velocity).magnitude;
-        float movementSmoothness = 1 - (float)System.Math.Tanh(velocityDeltaFromAverage * 2f);
+        float movementSmoothness = 1 - (float)System.Math.Tanh(velocityDeltaFromAverage);
+
+        //stable footing
+        Vector3 com = body.CenterOfMass();
+        Vector2 comXZ = new Vector2(com.x, com.z);
+
+        Vector3 afp = body.AverageFootPosition();
+        Vector2 afpXZ = new Vector2(afp.x, afp.z);
+
+        float stableFooting = 1f - (float)System.Math.Tanh((comXZ - afpXZ).magnitude*3f);
         
 
         //0 is away from target, 1 is towards target
@@ -472,9 +483,14 @@ public class MotionAgent : Agent
         if (forwardVelocity > 0)
         {
             reward *= Mathf.Pow(facingTarget, 2);
-            reward *= Mathf.Pow(forwardVelocity*0.75f, 2);
-            reward *= 2f;
-            reward *= efficiencyRollingAverage;
+            reward *= Mathf.Max(velocityTowardsTarget, 0);
+            reward *= forwardVelocity;
+            reward *= 4;
+
+            //reward *= movementSmoothness;
+            //reward *= stableFooting;
+
+            //reward *= Mathf.Pow(efficiencyRollingAverage, 2);
         }
         else
         {
@@ -483,9 +499,12 @@ public class MotionAgent : Agent
         }
 
         AddReward(reward); //reward for moving towards goal
+        
         AddReward(0.01f); //some reward just for not falling down
 
         DrawRedGreen(reward);
+
+
 
 
     }
@@ -639,5 +658,11 @@ public class MotionAgent : Agent
             }
         }
         return feetTouchingGround;
+    }
+
+    public void NextSeekTargetModel()
+    {
+        currentSeekTargetModelIndex += 1;
+        currentSeekTargetModelIndex %= seekTargetModels.Count;
     }
 }

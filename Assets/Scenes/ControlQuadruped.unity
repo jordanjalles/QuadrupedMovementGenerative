@@ -38,13 +38,13 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 11
-  m_GIWorkflowMode: 1
+  m_GIWorkflowMode: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -2269,6 +2269,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2478422406586179352, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
         type: 3}
+      propertyPath: seekTargetModels.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2478422406586179352, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
+        type: 3}
       propertyPath: target
       value: 
       objectReference: {fileID: 6963610560090537797, guid: a36a617af15c3fa42b6d71750afb3e21,
@@ -2282,7 +2287,7 @@ PrefabInstance:
         type: 3}
       propertyPath: seekTargetModel
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 215cfe5ec826e1340a22a99070b91ece,
+      objectReference: {fileID: 5022602860645237092, guid: 9183630729d975b4fb357d637d0a9922,
         type: 3}
     - target: {fileID: 2478422406586179352, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
         type: 3}
@@ -2331,6 +2336,35 @@ PrefabInstance:
       propertyPath: MaxStep
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2478422406586179352, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
+        type: 3}
+      propertyPath: stateBasedModelSwitching
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2478422406586179352, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
+        type: 3}
+      propertyPath: seekTargetModels.Array.data[0]
+      value: 
+      objectReference: {fileID: 5022602860645237092, guid: 215cfe5ec826e1340a22a99070b91ece,
+        type: 3}
+    - target: {fileID: 2478422406586179352, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
+        type: 3}
+      propertyPath: seekTargetModels.Array.data[1]
+      value: 
+      objectReference: {fileID: 5022602860645237092, guid: 9f2033114762c23429c0e90bdf0110a5,
+        type: 3}
+    - target: {fileID: 2478422406586179352, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
+        type: 3}
+      propertyPath: seekTargetModels.Array.data[2]
+      value: 
+      objectReference: {fileID: 5022602860645237092, guid: 9183630729d975b4fb357d637d0a9922,
+        type: 3}
+    - target: {fileID: 2478422406586179352, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
+        type: 3}
+      propertyPath: seekTargetModels.Array.data[3]
+      value: 
+      objectReference: {fileID: 5022602860645237092, guid: e2a28d7a9b9c2ab4e80c4fa161bf12b8,
+        type: 3}
     - target: {fileID: 2478422406586179353, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
         type: 3}
       propertyPath: m_Model
@@ -2442,5 +2476,11 @@ PrefabInstance:
       propertyPath: drag
       value: 0.3
       objectReference: {fileID: 0}
+    - target: {fileID: 2478422406586179358, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
+        type: 3}
+      propertyPath: headPrefab
+      value: 
+      objectReference: {fileID: 4789650688520116551, guid: 5f6b463ccd820c744aea081b66ef3b26,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ae8b23d2102dd3d4d9f31a42b0cfb672, type: 3}

@@ -33,6 +33,11 @@ public class MotionAgentController : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.RightShift))
+        {
+            motionAgent.NextSeekTargetModel();
+        }
+
         if (Input.GetAxis("Vertical") > 0)
         {
             UpdateModelState("forward");
@@ -41,6 +46,8 @@ public class MotionAgentController : MonoBehaviour
         {
             UpdateModelState("stay");
         }
+
+
 
         //update target position
         UpdateRig(Input.GetAxis("Horizontal"));
