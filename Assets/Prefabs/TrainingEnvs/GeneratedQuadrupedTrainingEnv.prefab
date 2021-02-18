@@ -752,7 +752,7 @@ PrefabInstance:
     - target: {fileID: 2478422406586179352, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
         type: 3}
       propertyPath: rewardMode
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2478422406586179352, guid: ae8b23d2102dd3d4d9f31a42b0cfb672,
         type: 3}

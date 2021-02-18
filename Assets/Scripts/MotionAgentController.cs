@@ -37,6 +37,14 @@ public class MotionAgentController : MonoBehaviour
         {
             motionAgent.NextSeekTargetModel();
         }
+        if (Input.GetAxis("Vertical") < 0)
+        {
+            motionAgent.CrouchedStayStandingModel();
+        }
+        else
+        {
+            motionAgent.TallStayStandingModel();
+        }
 
         if (Input.GetAxis("Vertical") > 0)
         {
