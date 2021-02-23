@@ -33,7 +33,7 @@ public class MotionAgentController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.RightShift))
+        if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
         {
             motionAgent.NextSeekTargetModel();
         }

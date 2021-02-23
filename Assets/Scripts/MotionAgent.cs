@@ -343,6 +343,7 @@ public class MotionAgent : Agent
 
         this.previousVectorActions = vectorAction;
 
+        Debug.Log(body.motorJoints.Count);
         //replacement drive loop with body native functions
         for (int i = 0; i < body.motorJoints.Count; i++)
         {

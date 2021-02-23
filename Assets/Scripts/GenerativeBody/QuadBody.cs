@@ -35,14 +35,21 @@ public class QuadBody : BodyGenerator
         ConnectAngledLimb(limbBL, chest, new Vector3(-90f, 0f, 0f), new Vector3(0.4f, 0f, -0.4f));
         ConnectAngledLimb(limbBR, chest, new Vector3(-90f, 0f, 0f), new Vector3(-0.4f, 0f, -0.4f));
 
-        /*
+        
         head = PrefabBodySegment(headPrefab);
-        ConnectWithJoint(head, chest,  "fixed");
+        Joint neck = ConnectWithJoint(head, chest,  "fixed");
+        head.drag = 0f;
+        head.angularDrag = 0f;
+        neck.connectedMassScale = 0.00001f;
+        
 
         
         tail = PrefabBodySegment(tailPrefab);
-        ConnectWithJoint(hips, tail,  "fixed");
-        */
+        Joint tailJoint = ConnectWithJoint(hips, tail,  "fixed");
+        tail.drag = 0f;
+        tail.angularDrag = 0f;
+        tailJoint.massScale = 0.00001f;
+        
 
     }
 }

@@ -141,7 +141,8 @@ public class BodyGenerator : MonoBehaviour
         foreach (Rigidbody limb in limbs)
         {
             joint = limb.GetComponentInChildren<ConfigurableJoint>();
-            if (joint != null)
+
+            if (joint != null && joint.angularXMotion == ConfigurableJointMotion.Limited)
             {
                 motorJoints.Add(joint);
             }
@@ -149,7 +150,7 @@ public class BodyGenerator : MonoBehaviour
         foreach (Rigidbody seg in torso)
         {
             joint = seg.GetComponentInChildren<ConfigurableJoint>();
-            if (joint != null)
+            if (joint != null && joint.angularXMotion == ConfigurableJointMotion.Limited)
             {
                 motorJoints.Add(joint);
             }

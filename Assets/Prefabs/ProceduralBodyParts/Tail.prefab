@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4014196174931672276}
   - component: {fileID: 7199925972712570441}
   - component: {fileID: 7015947997294877035}
-  - component: {fileID: 3799192213409388440}
+  - component: {fileID: 487562304197292392}
   m_Layer: 0
   m_Name: tail
   m_TagString: Untagged
@@ -30,10 +30,10 @@ Transform:
   m_GameObject: {fileID: 2768392478692486621}
   m_LocalRotation: {x: -0.20505802, y: -0, z: -0, w: 0.9787498}
   m_LocalPosition: {x: 0, y: 0.0662, z: -0.4471}
-  m_LocalScale: {x: 0.05, y: 0.050000004, z: 0.10000001}
+  m_LocalScale: {x: 0.05, y: 0.050000004, z: 0.1}
   m_Children: []
   m_Father: {fileID: 6887082596064514120}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -23.666, y: 0, z: 0}
 --- !u!33 &3016425169438938262
 MeshFilter:
@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4c296aae903288249b5d6e35664f4d86, type: 2}
+  - {fileID: 2100000, guid: 950d9cb49160d2d4394eee7d26be28f5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -103,7 +103,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2768392478692486621}
   serializedVersion: 2
-  m_Mass: 0.0001
+  m_Mass: 0.00001
   m_Drag: 0
   m_AngularDrag: 0
   m_UseGravity: 1
@@ -111,7 +111,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!59 &3799192213409388440
+--- !u!59 &487562304197292392
 HingeJoint:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -119,10 +119,10 @@ HingeJoint:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2768392478692486621}
   m_ConnectedBody: {fileID: 8609788431403692165}
-  m_Anchor: {x: 0, y: 0.50000006, z: -0.48}
+  m_Anchor: {x: 0, y: 0, z: -0.5}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: 0.06983032, z: -0.50109833}
+  m_ConnectedAnchor: {x: 0, y: 0.04612995, z: -0.49289513}
   m_UseSpring: 1
   m_Spring:
     spring: 0.0001
@@ -133,10 +133,10 @@ HingeJoint:
     targetVelocity: 0
     force: 0
     freeSpin: 0
-  m_UseLimits: 1
+  m_UseLimits: 0
   m_Limits:
-    min: -33.08857
-    max: 19.73681
+    min: -30
+    max: 30
     bounciness: 0
     bounceMinVelocity: 0.2
     contactDistance: 0
@@ -174,9 +174,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: -0.0586}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 6396503092661585260}
-  - {fileID: 7635596458313552567}
   - {fileID: 8264066057358635846}
+  - {fileID: 2128596579600857062}
+  - {fileID: 652150557226783251}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -191,12 +191,12 @@ Rigidbody:
   m_Mass: 0.0001
   m_Drag: 0
   m_AngularDrag: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!1 &7304799842477856128
+--- !u!1 &7405570311017112474
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -204,12 +204,12 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7635596458313552567}
-  - component: {fileID: 693833493375139203}
-  - component: {fileID: 645918136874790812}
-  - component: {fileID: 10938351789171069}
-  - component: {fileID: 4756570606804936592}
-  - component: {fileID: 4746469783101800913}
+  - component: {fileID: 2128596579600857062}
+  - component: {fileID: 9025844605621507992}
+  - component: {fileID: 4966896008821484966}
+  - component: {fileID: 6799418156164706381}
+  - component: {fileID: 7954355587284856116}
+  - component: {fileID: 51380723998198204}
   m_Layer: 0
   m_Name: tail (1)
   m_TagString: Untagged
@@ -217,35 +217,35 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7635596458313552567
+--- !u!4 &2128596579600857062
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7304799842477856128}
+  m_GameObject: {fileID: 7405570311017112474}
   m_LocalRotation: {x: -0.20505802, y: -0, z: -0, w: 0.9787498}
-  m_LocalPosition: {x: 0, y: 0.10326989, z: -0.36184993}
-  m_LocalScale: {x: 0.05, y: 0.050000004, z: 0.10000001}
+  m_LocalPosition: {x: 0, y: 0.099999994, z: -0.371}
+  m_LocalScale: {x: 0.05, y: 0.050000004, z: 0.1}
   m_Children: []
   m_Father: {fileID: 6887082596064514120}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: -23.666, y: 0, z: 0}
---- !u!33 &693833493375139203
+--- !u!33 &9025844605621507992
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7304799842477856128}
+  m_GameObject: {fileID: 7405570311017112474}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &645918136874790812
+--- !u!23 &4966896008821484966
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7304799842477856128}
+  m_GameObject: {fileID: 7405570311017112474}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -257,7 +257,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4c296aae903288249b5d6e35664f4d86, type: 2}
+  - {fileID: 2100000, guid: 950d9cb49160d2d4394eee7d26be28f5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -278,28 +278,28 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &10938351789171069
+--- !u!65 &6799418156164706381
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7304799842477856128}
+  m_GameObject: {fileID: 7405570311017112474}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &4756570606804936592
+--- !u!54 &7954355587284856116
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7304799842477856128}
+  m_GameObject: {fileID: 7405570311017112474}
   serializedVersion: 2
-  m_Mass: 0.0001
+  m_Mass: 0.00001
   m_Drag: 0
   m_AngularDrag: 0
   m_UseGravity: 1
@@ -307,18 +307,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!59 &4746469783101800913
+--- !u!59 &51380723998198204
 HingeJoint:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7304799842477856128}
+  m_GameObject: {fileID: 7405570311017112474}
   m_ConnectedBody: {fileID: 7015947997294877035}
-  m_Anchor: {x: 0, y: 0.50000006, z: -0.48}
+  m_Anchor: {x: 0, y: 0, z: -0.5}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: 0.49465874, z: 0.44960633}
+  m_ConnectedAnchor: {x: 0, y: 0.008217226, z: 0.33267552}
   m_UseSpring: 1
   m_Spring:
     spring: 0.0001
@@ -329,10 +329,10 @@ HingeJoint:
     targetVelocity: 0
     force: 0
     freeSpin: 0
-  m_UseLimits: 1
+  m_UseLimits: 0
   m_Limits:
-    min: -33.08857
-    max: 19.73681
+    min: -30
+    max: 30
     bounciness: 0
     bounceMinVelocity: 0.2
     contactDistance: 0
@@ -342,7 +342,7 @@ HingeJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
---- !u!1 &8747093752241570679
+--- !u!1 &8617927549553720205
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -350,12 +350,12 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6396503092661585260}
-  - component: {fileID: 6059224767165738844}
-  - component: {fileID: 7682971382208982686}
-  - component: {fileID: 8790847723092069953}
-  - component: {fileID: 3482600750687833188}
-  - component: {fileID: 6689788098468101449}
+  - component: {fileID: 652150557226783251}
+  - component: {fileID: 4615758626914524251}
+  - component: {fileID: 6986848599448522767}
+  - component: {fileID: 3957844804264810979}
+  - component: {fileID: 1215563310860039832}
+  - component: {fileID: 5749742532501234437}
   m_Layer: 0
   m_Name: tail (2)
   m_TagString: Untagged
@@ -363,35 +363,35 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6396503092661585260
+--- !u!4 &652150557226783251
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8747093752241570679}
+  m_GameObject: {fileID: 8617927549553720205}
   m_LocalRotation: {x: -0.20505802, y: -0, z: -0, w: 0.9787498}
-  m_LocalPosition: {x: 0, y: 0.14326988, z: -0.27184993}
-  m_LocalScale: {x: 0.05, y: 0.050000004, z: 0.10000001}
+  m_LocalPosition: {x: 0, y: 0.132, z: -0.298}
+  m_LocalScale: {x: 0.05, y: 0.050000004, z: 0.1}
   m_Children: []
   m_Father: {fileID: 6887082596064514120}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: -23.666, y: 0, z: 0}
---- !u!33 &6059224767165738844
+--- !u!33 &4615758626914524251
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8747093752241570679}
+  m_GameObject: {fileID: 8617927549553720205}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &7682971382208982686
+--- !u!23 &6986848599448522767
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8747093752241570679}
+  m_GameObject: {fileID: 8617927549553720205}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -403,7 +403,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4c296aae903288249b5d6e35664f4d86, type: 2}
+  - {fileID: 2100000, guid: 950d9cb49160d2d4394eee7d26be28f5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -424,28 +424,28 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &8790847723092069953
+--- !u!65 &3957844804264810979
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8747093752241570679}
+  m_GameObject: {fileID: 8617927549553720205}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &3482600750687833188
+--- !u!54 &1215563310860039832
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8747093752241570679}
+  m_GameObject: {fileID: 8617927549553720205}
   serializedVersion: 2
-  m_Mass: 0.0001
+  m_Mass: 0.00001
   m_Drag: 0
   m_AngularDrag: 0
   m_UseGravity: 1
@@ -453,18 +453,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!59 &6689788098468101449
+--- !u!59 &5749742532501234437
 HingeJoint:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8747093752241570679}
-  m_ConnectedBody: {fileID: 4756570606804936592}
-  m_Anchor: {x: 0, y: 0.50000006, z: -0.48}
+  m_GameObject: {fileID: 8617927549553720205}
+  m_ConnectedBody: {fileID: 7954355587284856116}
+  m_Anchor: {x: 0, y: 0, z: -0.5}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: 0.51019996, z: 0.50487244}
+  m_ConnectedAnchor: {x: 0, y: 0.00013217329, z: 0.297057}
   m_UseSpring: 1
   m_Spring:
     spring: 0.0001
@@ -475,10 +475,10 @@ HingeJoint:
     targetVelocity: 0
     force: 0
     freeSpin: 0
-  m_UseLimits: 1
+  m_UseLimits: 0
   m_Limits:
-    min: -33.08857
-    max: 19.73681
+    min: -30
+    max: 30
     bounciness: 0
     bounceMinVelocity: 0.2
     contactDistance: 0
